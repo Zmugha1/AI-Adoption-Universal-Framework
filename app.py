@@ -6,6 +6,8 @@ import streamlit as st
 import runpy
 from pathlib import Path
 
+from shared import render_sidebar
+
 st.set_page_config(
     page_title="Universal AI Governance Framework",
     page_icon="●",
@@ -13,25 +15,10 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Section 1: Navigation (top)
-st.sidebar.title("Navigation")
-page = st.sidebar.radio("Go to", [
-    "1. Framework & Architecture",
-    "2. Baseline Assessment (M2)",
-    "3. Scaling Ready (M3)"
-])
-
-# Section 2: Demo
-st.sidebar.divider()
-st.sidebar.subheader("Demo")
-st.sidebar.page_link("pages/1_Framework_Details.py", label="Framework Details", icon=":material/architecture:")
-st.sidebar.page_link("pages/2_Consultant_Workflow.py", label="Consultant Workflow", icon=":material/work:")
-st.sidebar.page_link("pages/3_Developer_Experience.py", label="Developer Experience", icon=":material/code:")
-
-# Section 3: App (last)
-st.sidebar.divider()
-st.sidebar.subheader("App")
-st.sidebar.page_link("app.py", label="Home", icon=":material/home:")
+# Sidebar: Navigation, Demo, App (read nav from query params for deep links)
+nav_param = st.query_params.get("nav", "1")
+nav_index = max(0, min(2, int(nav_param) - 1)) if nav_param.isdigit() else 0
+page = render_sidebar(use_nav_radio=True, nav_index=nav_index)
 
 # Load the selected page
 nav_dir = Path(__file__).parent / "nav_pages"

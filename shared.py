@@ -1,4 +1,42 @@
 """Shared constants and config for the framework demo."""
+import streamlit as st
+
+
+def render_sidebar(use_nav_radio=True, nav_index=0):
+    """Render the unified sidebar (Navigation, Demo, App) on every page.
+    use_nav_radio: True on app.py (radio for nav selection), False on pages (links instead).
+    nav_index: When use_nav_radio, which option to select by default (0, 1, or 2).
+    """
+    NAV_OPTIONS = [
+        "1. Framework & Architecture",
+        "2. Baseline Assessment (M2)",
+        "3. Scaling Ready (M3)"
+    ]
+    # Section 1: Navigation
+    st.sidebar.title("Navigation")
+    if use_nav_radio:
+        nav = st.sidebar.radio("Go to", NAV_OPTIONS, index=min(nav_index, 2))
+    else:
+        nav = None
+        st.sidebar.page_link("app.py", label="1. Framework & Architecture", query_params={"nav": "1"})
+        st.sidebar.page_link("app.py", label="2. Baseline Assessment (M2)", query_params={"nav": "2"})
+        st.sidebar.page_link("app.py", label="3. Scaling Ready (M3)", query_params={"nav": "3"})
+
+    # Section 2: Demo
+    st.sidebar.divider()
+    st.sidebar.subheader("Demo")
+    st.sidebar.page_link("pages/1_Framework_Details.py", label="Framework Details", icon=":material/architecture:")
+    st.sidebar.page_link("pages/2_Consultant_Workflow.py", label="Consultant Workflow", icon=":material/work:")
+    st.sidebar.page_link("pages/3_Developer_Experience.py", label="Developer Experience", icon=":material/code:")
+
+    # Section 3: App
+    st.sidebar.divider()
+    st.sidebar.subheader("App")
+    st.sidebar.page_link("app.py", label="Home", icon=":material/home:")
+
+    return nav
+
+
 MATURITY_COLORS = {
     "M1": "#808080",
     "M2": "#FF8C00",

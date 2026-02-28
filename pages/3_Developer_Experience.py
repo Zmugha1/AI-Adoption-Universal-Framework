@@ -1,9 +1,15 @@
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
 import streamlit as st
 import pandas as pd
 import json
 from datetime import datetime
+from shared import render_sidebar
 
 st.set_page_config(page_title="Developer Experience", page_icon="●")
+render_sidebar(use_nav_radio=False)
 
 # Color constants
 RED = "#DC143C"

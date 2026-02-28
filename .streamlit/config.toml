@@ -1,0 +1,3 @@
+[client]
+# Hide default Pages nav so our custom Navigation, Demo, App sections are visible
+showSidebarNavigation = false
