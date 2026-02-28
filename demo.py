@@ -14,8 +14,7 @@ st.set_page_config(
 # Navigation section first (top), Demo section below
 framework_pg = st.Page(
     "nav_pages/framework_architecture.py",
-    title="Framework & Architecture",
-    default=True
+    title="Framework & Architecture"
 )
 baseline_pg = st.Page(
     "nav_pages/baseline_assessment.py",
