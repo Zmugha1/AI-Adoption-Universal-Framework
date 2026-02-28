@@ -1,0 +1,15 @@
+{
+  "maturity": "M3",
+  "adoption_rate": 82,
+  "entropy_index": 31,
+  "velocity_prs_per_week": 74,
+  "cycle_time_hours": 54,
+  "rework_rate": 14,
+  "premature_acceptance": 8,
+  "code_bloat_weekly": 4,
+  "revert_frequency": 3,
+  "red_zone_violations": 2,
+  "champion_documentation": 100,
+  "team_size": 50,
+  "target_date": "2026-04-28"
+}
