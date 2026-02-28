@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 
-st.set_page_config(page_title="Framework Details", page_icon="📚")
+st.set_page_config(page_title="Framework Details", page_icon="●")
 
 st.title("Framework Components")
 
@@ -27,7 +27,7 @@ st.header("SDLC Zoning Matrix", divider=True)
 zone_data = {
     "Workflow Phase": ["Requirements", "Design", "Implementation", "Testing", "Deployment", "Monitoring"],
     "Sample Task": ["Security compliance", "Database schema", "CRUD operations", "Unit tests", "Production release", "Alert tuning"],
-    "Zone": ["🔴 Red", "🔴 Red", "🟢 Green", "🟢 Green", "🔴 Red", "🔴 Red"],
+    "Zone": ["RED", "RED", "GREEN", "GREEN", "RED", "RED"],
     "JTA Elements": ["Critical thinking", "Pattern recognition", "Tool proficiency", "Attention to detail", "Risk assessment", "Impact analysis"],
     "VTCO Doc": ["Verb: Elicit", "Verb: Architect", "Verb: Implement", "Verb: Validate", "Verb: Release", "Verb: Tune"],
     "Who Decides": ["Champion", "Champion", "Developer (Green)", "Developer (Green)", "Champion", "Champion"],

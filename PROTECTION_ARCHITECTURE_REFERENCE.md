@@ -16,9 +16,9 @@ Use this as the source of truth when building slides or diagrams.
 - EXIT at M3/M4
 
 ### What You DON'T Do
-- ❌ Write production code
-- ❌ Make architectural decisions
-- ❌ Stay forever
+- Write production code
+- Make architectural decisions
+- Stay forever
 
 ### Protecting Human Coding Architecture
 - **Threat:** AI generates inconsistent patterns
@@ -38,11 +38,11 @@ Use this as the source of truth when building slides or diagrams.
 - Blocks commits violating rules
 
 ### What It CANNOT Do (Reality)
-- ❌ Know business priority
-- ❌ Write tribal knowledge
-- ❌ Judge promotion readiness
-- ❌ Build trust with humans
-- ❌ Override emergencies
+- Know business priority
+- Write tribal knowledge
+- Judge promotion readiness
+- Build trust with humans
+- Override emergencies
 
 ### Protecting Tribal Knowledge
 - **Threat:** Experts leave, knowledge evaporates
@@ -63,9 +63,9 @@ Use this as the source of truth when building slides or diagrams.
 - Pattern Definition ("our way")
 
 ### What They DON'T Do
-- ❌ Manual enforcement (MCP blocks automatically)
-- ❌ 20-page docs (VTCO is structured YAML)
-- ❌ Review boilerplate (Green Zone is automated)
+- Manual enforcement (MCP blocks automatically)
+- 20-page docs (VTCO is structured YAML)
+- Review boilerplate (Green Zone is automated)
 
 ### Protecting Champion Expert Judgment
 - **Threat:** Champions burned out, become bottlenecks

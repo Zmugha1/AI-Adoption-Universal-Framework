@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 # Page config
 st.set_page_config(
     page_title="Universal AI Governance Framework",
-    page_icon="🎯",
+    page_icon="●",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -315,7 +315,6 @@ if page == "1. Framework & Architecture":
             st.warning("**Governance Priority:** Identify and empower champions. Begin documentation of critical architectural decisions.")
         if current_score < 15:
             st.warning("**Adoption Priority:** Focus on training and confidence-building before scaling. High rework indicates need for scaffolding.")
-        st.balloons()
 
     # THREE ACTORS IN GOVERNANCE (Demo-Ready Version)
     st.header("Three Actors in Governance", divider=True)
@@ -323,7 +322,7 @@ if page == "1. Framework & Architecture":
     st.markdown("*A lean consulting architecture for AI adoption*")
 
     # Actor 1: Zubia (Consultant) - In Expander
-    with st.expander("🎯 **Zubia** — AI Training Consultant (8-week engagement)", expanded=False):
+    with st.expander("**Zubia** — AI Training Consultant (8-week engagement)", expanded=False):
         st.caption("*I set up the system, train your champions, then exit.*")
 
         col1, col2 = st.columns(2)
@@ -350,7 +349,7 @@ if page == "1. Framework & Architecture":
             st.write("Workforce development + ML systems. I bring the governance framework, configure the technical infrastructure, and enable your champions to scale without me.")
 
     # Actor 2: MCP Server - In Expander
-    with st.expander("🤖 **MCP Server** — Technical Enforcer (Local Python script)", expanded=False):
+    with st.expander("**MCP Server** — Technical Enforcer (Local Python script)", expanded=False):
         st.caption("*The automation layer—blocks, scaffolds, and measures.*")
 
         col1, col2 = st.columns(2)
@@ -377,7 +376,7 @@ if page == "1. Framework & Architecture":
             st.write("The Model Context Protocol is a local script that Cursor/Copilot call for context. It's lightweight, standardized, and runs on the developer's machine—not cloud infrastructure.")
 
     # Actor 3: Champion - In Expander
-    with st.expander("👑 **Champion** — Your Domain Expert (Protected & Enabled)", expanded=False):
+    with st.expander("**Champion** — Your Domain Expert (Protected & Enabled)", expanded=False):
         st.caption("*The human authority—owns decisions, mentors, defines patterns.*")
 
         col1, col2 = st.columns(2)
@@ -408,7 +407,7 @@ if page == "1. Framework & Architecture":
     st.caption("**The Flow:** Zubia configures → MCP enforces → Champion decides → Team adopts → Entropy drops → Consultant exits")
 
     # Optional: Show interaction diagram in nested expander
-    with st.expander("📊 View Week-by-Week Engagement Timeline"):
+    with st.expander("View Week-by-Week Engagement Timeline"):
         timeline_data = {
             "Week": ["0-1", "2-4", "5-8", "9-12"],
             "Zubia": ["Assessment + Workshop", "Train + Dashboard", "Check-in (fading)", "EXIT (quarterly only)"],
@@ -425,7 +424,7 @@ if page == "1. Framework & Architecture":
     with protect_col1:
         st.markdown("""
         <div style='background-color: #E3F2FD; padding: 15px; border-radius: 8px; border-left: 4px solid #2196F3; min-height: 280px;'>
-            <h4 style='color: #1565C0; margin-top: 0;'>🛡️ Protecting Human Coding Architecture</h4>
+            <h4 style='color: #1565C0; margin-top: 0;'>Protecting Human Coding Architecture</h4>
             <p style='font-size: 0.9em;'><strong>Threat:</strong> AI generates inconsistent patterns, technical debt accumulates</p>
             <p style='font-size: 0.9em;'><strong>Solution:</strong></p>
             <ul style='font-size: 0.85em; padding-left: 20px;'>
@@ -440,7 +439,7 @@ if page == "1. Framework & Architecture":
     with protect_col2:
         st.markdown("""
         <div style='background-color: #F3E5F5; padding: 15px; border-radius: 8px; border-left: 4px solid #9C27B0; min-height: 280px;'>
-            <h4 style='color: #7B1FA2; margin-top: 0;'>🧠 Protecting Tribal Knowledge</h4>
+            <h4 style='color: #7B1FA2; margin-top: 0;'>Protecting Tribal Knowledge</h4>
             <p style='font-size: 0.9em;'><strong>Threat:</strong> Experts leave, knowledge evaporates, AI guesses wrong</p>
             <p style='font-size: 0.9em;'><strong>Solution:</strong></p>
             <ul style='font-size: 0.85em; padding-left: 20px;'>
@@ -455,7 +454,7 @@ if page == "1. Framework & Architecture":
     with protect_col3:
         st.markdown("""
         <div style='background-color: #FFF3E0; padding: 15px; border-radius: 8px; border-left: 4px solid #FF9800; min-height: 280px;'>
-            <h4 style='color: #EF6C00; margin-top: 0;'>⚖️ Protecting Champion Expert Judgment</h4>
+            <h4 style='color: #EF6C00; margin-top: 0;'>Protecting Champion Expert Judgment</h4>
             <p style='font-size: 0.9em;'><strong>Threat:</strong> Champions burned out, become bottlenecks, lose autonomy</p>
             <p style='font-size: 0.9em;'><strong>Solution:</strong></p>
             <ul style='font-size: 0.85em; padding-left: 20px;'>
@@ -485,8 +484,8 @@ if page == "1. Framework & Architecture":
             "Alert threshold tuning", "Dashboard creation"
         ],
         "Zone": [
-            "🔴 RED", "🟡 YELLOW", "🔴 RED", "🟢 GREEN", "🔴 RED", "🟢 GREEN", "🟡 YELLOW",
-            "🔴 RED", "🟢 GREEN", "🟡 YELLOW", "🔴 RED", "🟡 YELLOW", "🔴 RED", "🟢 GREEN"
+            "RED", "YELLOW", "RED", "GREEN", "RED", "GREEN", "YELLOW",
+            "RED", "GREEN", "YELLOW", "RED", "YELLOW", "RED", "GREEN"
         ],
         "Risk Rationale": [
             "Compliance violations irreversible", "Scope creep affects timeline", "Schema changes expensive",
@@ -530,7 +529,7 @@ if page == "1. Framework & Architecture":
     with zone_summary_col1:
         st.markdown("""
         <div style='background-color: #DC143C20; padding: 20px; border-radius: 10px; border-left: 5px solid #DC143C;'>
-            <h4 style='color: #DC143C; margin-top: 0;'>🔴 RED ZONE</h4>
+            <h4 style='color: #DC143C; margin-top: 0;'>RED ZONE</h4>
             <p><strong>Architectural Authority</strong></p>
             <ul>
                 <li>Irreversible decisions</li>
@@ -545,7 +544,7 @@ if page == "1. Framework & Architecture":
     with zone_summary_col2:
         st.markdown("""
         <div style='background-color: #FFD70020; padding: 20px; border-radius: 10px; border-left: 5px solid #FFD700;'>
-            <h4 style='color: #B8860B; margin-top: 0;'>🟡 YELLOW ZONE</h4>
+            <h4 style='color: #B8860B; margin-top: 0;'>YELLOW ZONE</h4>
             <p><strong>Collaborative Implementation</strong></p>
             <ul>
                 <li>Pattern implementation</li>
@@ -560,7 +559,7 @@ if page == "1. Framework & Architecture":
     with zone_summary_col3:
         st.markdown("""
         <div style='background-color: #228B2220; padding: 20px; border-radius: 10px; border-left: 5px solid #228B22;'>
-            <h4 style='color: #228B22; margin-top: 0;'>🟢 GREEN ZONE</h4>
+            <h4 style='color: #228B22; margin-top: 0;'>GREEN ZONE</h4>
             <p><strong>Autonomous Execution</strong></p>
             <ul>
                 <li>Standard tasks</li>
@@ -579,16 +578,16 @@ if page == "1. Framework & Architecture":
     The framework adapts AI assistance based on developer capability (ZPD - Zone of Proximal Development)
     with time-bound, measurable progression goals.
     """)
-    skills_expander = st.expander("📊 View Complete Skill Matrix & SMART Goals Framework", expanded=True)
+    skills_expander = st.expander("View Complete Skill Matrix & SMART Goals Framework", expanded=True)
     with skills_expander:
         skills_data = {
             "Role Level": ["Novice", "Intermediate", "Expert", "Champion"],
             "Experience": ["0-2 years", "2-5 years", "5+ years", "7+ years + Domain Expertise"],
             "Zone Permissions": [
-                "🟢 Green: Full\n🟡 Yellow: With mentor\n🔴 Red: Read-only",
-                "🟢 Green: Full\n🟡 Yellow: Full\n🔴 Red: Suggest only",
-                "🟢 Green: Full\n🟡 Yellow: Full\n🔴 Red: Draft proposals",
-                "🟢 Green: Governs\n🟡 Yellow: Governs\n🔴 Red: Owns decisions"
+                "Green: Full / Yellow: With mentor / Red: Read-only",
+                "Green: Full / Yellow: Full / Red: Suggest only",
+                "Green: Full / Yellow: Full / Red: Draft proposals",
+                "Green: Governs / Yellow: Governs / Red: Owns decisions"
             ],
             "Current Capabilities": [
                 "Learning patterns, needs guidance on all tasks",
@@ -699,7 +698,7 @@ if page == "1. Framework & Architecture":
                 "1 Yellow PR opened, mentor assigned",
                 "1 Yellow PR approved, auto-promoted by MCP"
             ],
-            "Status": ["🟡 On Track", "🟡 On Track", "🟢 Exceeding", "🟡 On Track", "🟢 PROMOTED"]
+            "Status": ["[On Track]", "[On Track]", "[Exceeding]", "[On Track]", "[PROMOTED]"]
         }
         st.dataframe(pd.DataFrame(progression_data), use_container_width=True)
         st.success("""
@@ -768,7 +767,7 @@ escalation_path:
 
 elif page == "2. Baseline Assessment (M2)":
     st.title("Current State: M2 (Shallow Adoption)")
-    st.markdown(f"<h4 style='color: {MATURITY_COLORS['M2']};'>🟠 The M2 Trap: Activity Without Governance</h4>", unsafe_allow_html=True)
+    st.markdown(f"<h4 style='color: {MATURITY_COLORS['M2']};'>The M2 Trap: Activity Without Governance</h4>", unsafe_allow_html=True)
     
     # Executive Summary
     st.header("Executive Summary", divider=True)
@@ -802,7 +801,7 @@ elif page == "2. Baseline Assessment (M2)":
         "Metric": ["Adoption Rate", "Entropy Index", "Velocity (PRs/week)", "Rework Rate", "Premature Acceptance", "Red Zone Violations", "Champion Documentation"],
         "Current Value": ["22%", "68", "47", "34%", "41%", "23/month", "0%"],
         "Target (M3)": ["82%", "31", "74", "14%", "8%", "<5/month", "100%"],
-        "Status": ["🟠 Gap", "🟠 High", "🟠 Below", "🟠 High", "🟠 Risk", "🟠 Uncontrolled", "🟠 At Risk"]
+        "Status": ["[Gap]", "[High]", "[Below]", "[High]", "[Risk]", "[Uncontrolled]", "[At Risk]"]
     }
     
     st.dataframe(pd.DataFrame(baseline_data), use_container_width=True)
@@ -819,7 +818,7 @@ elif page == "2. Baseline Assessment (M2)":
 
 else:  # Page 3
     st.title("Target State: M3 (Agentic with Guardrails)")
-    st.markdown(f"<h4 style='color: {MATURITY_COLORS['M3']};'>🔵 Velocity with Stability: The Three Roles Working</h4>", unsafe_allow_html=True)
+    st.markdown(f"<h4 style='color: {MATURITY_COLORS['M3']};'>Velocity with Stability: The Three Roles Working</h4>", unsafe_allow_html=True)
     
     # Executive Summary
     st.header("Executive Summary", divider=True)
@@ -842,7 +841,7 @@ else:  # Page 3
         "Evidence Category": ["Adoption Rate", "Entropy Index", "Velocity (PRs/week)", "Rework Rate", "Premature Acceptance", "Red Violations", "Champion Time on Innovation"],
         "M2 Baseline": ["22%", "68", "47", "34%", "41%", "23/month", "20%"],
         "M3 Achieved": ["82%", "31", "74", "14%", "8%", "2/month", "65%"],
-        "Improvement": ["+60% 🟢", "-54% 🟢", "+57% 🟢", "-59% 🟢", "-80% 🟢", "-91% 🟢", "+45% 🟢"]
+        "Improvement": ["+60%", "-54%", "+57%", "-59%", "-80%", "-91%", "+45%"]
     }
     
     st.dataframe(pd.DataFrame(comparison_data), use_container_width=True)
@@ -854,7 +853,7 @@ else:  # Page 3
     
     with role_evidence[0]:
         st.success("""
-        **🎯 Consultant (Week 0-8)**
+        **Consultant (Week 0-8)**
         - Assessment completed
         - Workshop facilitated
         - MCP configured
@@ -864,7 +863,7 @@ else:  # Page 3
     
     with role_evidence[1]:
         st.success("""
-        **🤖 MCP Server (Running)**
+        **MCP Server (Running)**
         - Red Zone: 23→2 violations (91% reduction)
         - Auto-enforcement active
         - Entropy logging: 68→31
@@ -873,7 +872,7 @@ else:  # Page 3
     
     with role_evidence[2]:
         st.success("""
-        **👑 Champions (Enabled)**
+        **Champions (Enabled)**
         - 100% tribal knowledge documented
         - Time on innovation: 20%→65%
         - 7 developers mentored to Intermediate
@@ -899,8 +898,8 @@ else:  # Page 3
     st.metric("Calculated Entropy", f"{entropy:.1f}/100")
     
     if entropy < 30:
-        st.success("🟢 M3 ACHIEVED: Ready for M4 (Autonomous) - Consultant can exit")
+        st.success("M3 ACHIEVED: Ready for M4 (Autonomous) - Consultant can exit")
     elif entropy < 45:
-        st.warning("🟡 M3 TRANSITION: Stabilizing governance")
+        st.warning("M3 TRANSITION: Stabilizing governance")
     else:
-        st.error("🔴 M2 CHAOS: Needs Consultant + MCP + Champion alignment")
+        st.error("M2 CHAOS: Needs Consultant + MCP + Champion alignment")

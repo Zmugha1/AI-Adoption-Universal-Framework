@@ -4,17 +4,17 @@ A consulting methodology for AI adoption that protects human expertise while ena
 
 ## The Three Roles Architecture
 
-🎯 **AI Training Consultant** (You)
+**AI Training Consultant** (You)
 - Assesses, architects, configures, trains, exits
 - Brings methodology + MCP setup + change management
 - 8-week engagement, then quarterly check-ins
 
-🤖 **MCP Server** (Technical Enforcer)
+**MCP Server** (Technical Enforcer)
 - Local Python script (not cloud infrastructure)
 - Blocks Red Zone edits, scaffolds by skill, logs entropy
 - Cannot judge business priority or build human trust
 
-👑 **Champion** (Human Expert)
+**Champion** (Human Expert)
 - Owns Red Zone decisions, authors tribal knowledge (VTCO)
 - Assesses skills, mentors transitions, governs emergencies
 - Protected from burnout by automation

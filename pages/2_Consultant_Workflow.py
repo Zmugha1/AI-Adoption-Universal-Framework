@@ -1,6 +1,6 @@
 import streamlit as st
 
-st.set_page_config(page_title="Consultant Workflow", page_icon="🎯")
+st.set_page_config(page_title="Consultant Workflow", page_icon="●")
 
 st.title("The Lean Consulting Architecture")
 
@@ -22,9 +22,9 @@ for item in timeline_data:
     with st.container():
         cols = st.columns([1, 3, 3, 3])
         cols[0].markdown(f"**{item['Week']}**")
-        cols[1].info(f"🎯 {item['Consultant']}")
-        cols[2].success(f"🤖 {item['MCP']}")
-        cols[3].warning(f"👑 {item['Champion']}")
+        cols[1].info(f"{item['Consultant']}")
+        cols[2].success(f"{item['MCP']}")
+        cols[3].warning(f"{item['Champion']}")
         st.divider()
 
 # Value Proposition
