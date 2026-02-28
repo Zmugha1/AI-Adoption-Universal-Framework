@@ -317,89 +317,105 @@ if page == "1. Framework & Architecture":
             st.warning("**Adoption Priority:** Focus on training and confidence-building before scaling. High rework indicates need for scaffolding.")
         st.balloons()
 
-    # THREE ACTORS IN GOVERNANCE (Streamlit-native, no HTML)
+    # THREE ACTORS IN GOVERNANCE (Demo-Ready Version)
     st.header("Three Actors in Governance", divider=True)
 
-    actor_col1, actor_col2, actor_col3 = st.columns([1, 1, 1], gap="large")
+    st.markdown("*A lean consulting architecture for AI adoption*")
 
-    with actor_col1:
-        st.subheader("AI Training Consultant")
-        st.caption("You/The Consultant")
-        st.divider()
+    # Actor 1: Zubia (Consultant) - In Expander
+    with st.expander("🎯 **Zubia** — AI Training Consultant (8-week engagement)", expanded=False):
+        st.caption("*I set up the system, train your champions, then exit.*")
 
-        st.write("**What You Do:**")
-        st.write("• Assess M1-M4 maturity levels")
-        st.write("• Architect zone structure (Red/Yellow/Green)")
-        st.write("• Facilitate champion workshops")
-        st.write("• Configure MCP server")
-        st.write("• Train champions (teach the teachers)")
-        st.write("• Build entropy dashboards")
-        st.write("• EXIT at M3/M4 (consultant fades)")
+        col1, col2 = st.columns(2)
 
-        st.write("")
-        st.write("**What You DON'T Do:**")
-        st.write("• Write production code")
-        st.write("• Make architectural decisions")
-        st.write("• Enforce rules daily")
-        st.write("• Stay forever (lean consulting)")
+        with col1:
+            st.write("**What I Do:**")
+            st.write("• Assess M1-M4 maturity")
+            st.write("• Architect Red/Yellow/Green zones")
+            st.write("• Facilitate champion workshop")
+            st.write("• Configure MCP server")
+            st.write("• Build entropy dashboard")
+            st.write("• **EXIT at M3/M4**")
 
-        st.write("")
-        st.info("\"I build the system that protects your experts, then I leave.\"")
+        with col2:
+            st.write("**What I DON'T Do:**")
+            st.write("• Write your production code")
+            st.write("• Make architectural decisions (champions do)")
+            st.write("• Enforce daily (MCP does)")
+            st.write("• Stay forever (lean consulting)")
 
-        with st.expander("? Consultant Details"):
-            st.write("Brings methodology, MCP configuration, and change management. Sets up system in 2-3 weeks, then fades to quarterly check-ins.")
+        st.info("\"*I build the system that protects your experts, then I leave.*\"")
 
-    with actor_col2:
-        st.subheader("MCP Server")
-        st.caption("The Technical Enforcer")
-        st.divider()
+        with st.expander("? My Methodology"):
+            st.write("Workforce development + ML systems. I bring the governance framework, configure the technical infrastructure, and enable your champions to scale without me.")
 
-        st.write("**What It Does:**")
-        st.write("• Guards Red Zone files (blocks unauthorized edits)")
-        st.write("• Scaffolds based on skill (Novice=verbose, Expert=terse)")
-        st.write("• Counts entropy metrics automatically")
-        st.write("• Reminds of VTCO constraints")
-        st.write("• Blocks commits violating rules")
+    # Actor 2: MCP Server - In Expander
+    with st.expander("🤖 **MCP Server** — Technical Enforcer (Local Python script)", expanded=False):
+        st.caption("*The automation layer—blocks, scaffolds, and measures.*")
 
-        st.write("")
-        st.write("**What It CANNOT Do:**")
-        st.write("• Know business priority (champions decide this)")
-        st.write("• Write tribal knowledge (champions author this)")
-        st.write("• Judge promotion readiness (champions assess this)")
-        st.write("• Build trust with humans (champions do this)")
-        st.write("• Override emergencies (champions govern this)")
+        col1, col2 = st.columns(2)
 
-        st.write("")
-        st.info("\"Not a data center. One Python file. The 'server' just means it responds to Cursor/Copilot requests.\"")
+        with col1:
+            st.write("**What It Does:**")
+            st.write("• Guards Red Zone (blocks edits)")
+            st.write("• Scaffolds by skill (Novice=verbose)")
+            st.write("• Counts entropy metrics")
+            st.write("• Reminds of constraints")
+            st.write("• Blocks rule violations")
 
-        with st.expander("? MCP Details"):
-            st.write("The Model Context Protocol is like USB-C for AI. Lightweight, local, standardized. Exposes 'tools' that AI assistants call to check zones and validate code.")
+        with col2:
+            st.write("**What It CANNOT Do:**")
+            st.write("• Know business priority")
+            st.write("• Write tribal knowledge")
+            st.write("• Judge promotion readiness")
+            st.write("• Build human trust")
+            st.write("• Override emergencies")
 
-    with actor_col3:
-        st.subheader("Champion")
-        st.caption("The Human Expert")
-        st.divider()
+        st.info("\"*Not a data center. One Python file. USB-C for AI.*\"")
 
-        st.write("**What They Own:**")
-        st.write("• Red Zone Decisions (veto power)")
-        st.write("• Tribal Knowledge (VTCO docs)")
-        st.write("• Skill Assessment (Novice vs Expert)")
-        st.write("• Mentoring (human coaching)")
-        st.write("• Governance Override (emergency judgment)")
-        st.write("• Pattern Definition (\"our way\")")
+        with st.expander("? Technical Reality"):
+            st.write("The Model Context Protocol is a local script that Cursor/Copilot call for context. It's lightweight, standardized, and runs on the developer's machine—not cloud infrastructure.")
 
-        st.write("")
-        st.write("**What They DON'T Do:**")
-        st.write("• Manual enforcement (MCP blocks automatically)")
-        st.write("• 20-page docs (VTCO is structured YAML)")
-        st.write("• Review boilerplate (Green Zone is automated)")
-        st.write("• 24/7 availability (protected time)")
+    # Actor 3: Champion - In Expander
+    with st.expander("👑 **Champion** — Your Domain Expert (Protected & Enabled)", expanded=False):
+        st.caption("*The human authority—owns decisions, mentors, defines patterns.*")
 
-        st.write("")
-        st.info("\"The most expensive expertise. Amplified, not replaced. Protected from becoming a bottleneck.\"")
+        col1, col2 = st.columns(2)
 
-        with st.expander("? Champion Details"):
-            st.write("Protected from burnout by MCP automation. Authority formalized via CODEOWNERS. Only true Red Zone decisions reach them.")
+        with col1:
+            st.write("**What They Own:**")
+            st.write("• Red Zone decisions (veto power)")
+            st.write("• Tribal knowledge (VTCO docs)")
+            st.write("• Skill assessment")
+            st.write("• Mentoring")
+            st.write("• Emergency override")
+            st.write("• Pattern definition")
+
+        with col2:
+            st.write("**What They DON'T Do:**")
+            st.write("• Manual enforcement (MCP blocks)")
+            st.write("• 20-page docs (structured YAML)")
+            st.write("• Boilerplate review (automated)")
+            st.write("• 24/7 availability (protected)")
+
+        st.info("\"*Your most expensive expertise. Amplified, not replaced. Protected from burnout.*\"")
+
+        with st.expander("? Champion Protection"):
+            st.write("MCP filters noise so only true Red Zone decisions reach them. They spend 65% time on innovation (not gatekeeping) by M3.")
+
+    # Visual Summary (Compact)
+    st.divider()
+    st.caption("**The Flow:** Zubia configures → MCP enforces → Champion decides → Team adopts → Entropy drops → Consultant exits")
+
+    # Optional: Show interaction diagram in nested expander
+    with st.expander("📊 View Week-by-Week Engagement Timeline"):
+        timeline_data = {
+            "Week": ["0-1", "2-4", "5-8", "9-12"],
+            "Zubia": ["Assessment + Workshop", "Train + Dashboard", "Check-in (fading)", "EXIT (quarterly only)"],
+            "MCP": ["Install + Configure", "Enforce zones", "Auto-promotions", "Autonomous"],
+            "Champion": ["Provide knowledge", "Learn VTCO", "Own Red Zone", "Full authority"]
+        }
+        st.dataframe(pd.DataFrame(timeline_data), use_container_width=True, hide_index=True)
 
     # Protection Architecture - IMPROVED
     st.header("Protection Architecture", divider=True)
