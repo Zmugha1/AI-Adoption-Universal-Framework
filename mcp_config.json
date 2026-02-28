@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "ai-governance": {
+      "command": "python",
+      "args": ["mcp_server.py"],
+      "env": {
+        "GOVERNANCE_REPO_PATH": ".",
+        "LOG_LEVEL": "INFO"
+      },
+      "disabled": false,
+      "autoApprove": []
+    }
+  }
+}

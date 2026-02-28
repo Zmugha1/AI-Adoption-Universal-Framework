@@ -1,0 +1,58 @@
+# VTCO (Verb-Task-Constraint-Outcome) Tribal Knowledge Template
+# Champions define these for critical domains. MCP injects into AI context.
+
+domain: payment_processing
+champion_owner: "@champion-payment"
+last_updated: "2024-01-15"
+
+# Verb: The action being performed (from SDLC zoning)
+verb: Implement
+
+# Task: What the developer/AI is trying to accomplish
+task: |
+  Add or modify payment transaction logic, including:
+  - Amount validation
+  - Currency handling
+  - Idempotency keys
+  - Audit logging
+
+# Constraints: Non-negotiable rules
+constraints:
+  - "All payment flows MUST use idempotency keys (UUID v4)"
+  - "Amounts MUST be stored in smallest currency unit (cents)"
+  - "No direct database writes in payment handlers - use repository pattern"
+  - "All mutations MUST be logged to audit_log table with actor_id"
+  - "PCI scope: Never log full card numbers; mask after first 6 digits"
+
+# Outcome: Expected result and validation
+outcome: |
+  - Unit tests cover happy path and all constraint violations
+  - Integration test with mock payment gateway
+  - ADR created for any new payment flow pattern
+  - Champion review required before merge
+
+# AI behavior rules (injected into MCP context)
+ai_behavior:
+  allowed:
+    - "Suggest code that follows repository pattern"
+    - "Generate unit test scaffolding"
+    - "Propose idempotency key implementation"
+  forbidden:
+    - "Direct SQL in payment handlers"
+    - "Storing raw card data"
+    - "Skipping audit logging"
+  reminder: |
+    Payment logic is Red Zone. AI may suggest patterns but Champion must approve.
+    Always check constraints before generating code.
+
+# Escalation path
+escalation_path:
+  first: "@champion-payment"
+  backup: "@champion-security"
+  emergency: "Slack #payments-critical"
+
+# Domain-to-file mapping (for auto-lookup)
+domain_mapping:
+  - "**/payment/**"
+  - "**/transaction*"
+  - "**/billing/**"

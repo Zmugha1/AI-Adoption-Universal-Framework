@@ -47,6 +47,57 @@ pip install -r requirements.txt
 streamlit run app.py
 ```
 
+## MCP Server (Cursor Integration)
+
+The MCP server enforces governance rules, zoning, and entropy tracking in Cursor IDE.
+
+### Setup
+
+1. Install MCP dependencies:
+   ```bash
+   pip install -r requirements-mcp.txt
+   ```
+
+2. Add to Cursor MCP settings. Copy the `mcp_config.json` content into your Cursor MCP configuration (Settings → MCP). Use the full path to `mcp_server.py` in the `args` if needed:
+   ```json
+   {
+     "mcpServers": {
+       "ai-governance": {
+         "command": "python",
+         "args": ["C:/path/to/ai-governance-demo/mcp_server.py"],
+         "env": { "GOVERNANCE_REPO_PATH": "C:/path/to/ai-governance-demo" }
+       }
+     }
+   }
+   ```
+
+3. Run the server standalone (stdio):
+   ```bash
+   python mcp_server.py
+   ```
+
+### Tools
+
+- **check_zoning_permission** – Check if an edit is allowed (file path, role, phase)
+- **get_tribal_knowledge** – Retrieve VTCO context for a domain
+- **calculate_entropy** – Compute and log entropy score
+- **validate_code_patterns** – Check code against architectural patterns
+- **record_decision** – Log ADR and champion approvals
+
+### Logs
+
+- Entropy: `.ai-governance/entropy_log.jsonl`
+- Violations: `.ai-governance/violations.jsonl`
+- Tribal knowledge: `.ai-governance/tribal-knowledge/*.yaml`
+
+### Tests
+
+```bash
+cd ai-governance-demo
+pip install -r requirements-mcp.txt
+pytest tests/ -v
+```
+
 ## For Headstorm AI Interview
 
 February 2026

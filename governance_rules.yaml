@@ -1,0 +1,109 @@
+# AI Adoption Universal Framework - Governance Rules
+# Defines Red/Yellow/Green zoning, skill scaffolding, and entropy thresholds.
+# Used by the MCP server to enforce governance decisions.
+
+zones:
+  red:
+    description: "Irreversible decisions, compliance boundaries"
+    sdlc_phases:
+      - "Requirements-Security"
+      - "Design-Database"
+      - "Implementation-BusinessLogic"
+      - "Testing-Security"
+      - "Deployment-Production"
+      - "Monitoring-Alerts"
+    allowed_roles: ["Champion"]
+    ai_behavior: "suggest_only"
+    requires_adr: true
+    codeowner_pattern: "**/payment/** **/security/** **/config/production/**"
+
+  yellow:
+    description: "Pattern implementation, integration points"
+    sdlc_phases:
+      - "Requirements-Scope"
+      - "Design-UI"
+      - "Implementation-Integration"
+      - "Testing-Integration"
+      - "Deployment-CI/CD"
+    allowed_roles: ["Intermediate", "Expert", "Champion"]
+    novice_requires_mentor: true
+    ai_behavior: "generate_with_validation"
+    pattern_matching_required: true
+
+  green:
+    description: "Standard tasks, boilerplate, reversible"
+    sdlc_phases:
+      - "Implementation-CRUD"
+      - "Testing-Unit"
+      - "Monitoring-Dashboards"
+    allowed_roles: ["Novice", "Intermediate", "Expert", "Champion"]
+    ai_behavior: "full_autonomy"
+    auto_approve_criteria: "complexity < 10 && tests_pass"
+
+skill_scaffolding:
+  novice:
+    max_complexity: 5
+    verbosity: "maximum"
+    requires_explanation: true
+    mentor_required_for: ["Yellow", "Red"]
+
+  intermediate:
+    max_complexity: 10
+    verbosity: "moderate"
+    requires_explanation: false
+    mentor_required_for: ["Red"]
+
+  expert:
+    max_complexity: 15
+    verbosity: "minimal"
+    requires_explanation: false
+
+  champion:
+    max_complexity: 20
+    verbosity: "consultative"
+    governance_override: true
+
+entropy_thresholds:
+  m1_chaos: 70
+  m2_shallow: 50
+  m3_agentic: 30
+  m4_autonomous: 15
+
+# File path to SDLC phase mapping (regex patterns)
+file_path_mapping:
+  requirements:
+    - "**/requirements/**"
+    - "**/specs/**"
+    - "**/*.md"
+  design:
+    - "**/design/**"
+    - "**/schema/**"
+    - "**/migrations/**"
+  implementation:
+    - "**/src/**"
+    - "**/lib/**"
+    - "**/*.py"
+    - "**/*.js"
+    - "**/*.ts"
+    - "**/*.java"
+  testing:
+    - "**/test/**"
+    - "**/tests/**"
+    - "**/*_test.*"
+    - "**/*.spec.*"
+  deployment:
+    - "**/deploy/**"
+    - "**/config/**"
+    - "**/Dockerfile*"
+    - "**/.github/**"
+  monitoring:
+    - "**/monitoring/**"
+    - "**/alerts/**"
+
+# Red zone file patterns (CODEOWNERS-style)
+red_zone_patterns:
+  - "**/payment/**"
+  - "**/security/**"
+  - "**/config/production/**"
+  - "**/core/**"
+  - "**/transaction*"
