@@ -44,8 +44,10 @@ M1 (Gray) → M2 (Orange) → M3 (Blue) → M4 (Gold)
 
 ```bash
 pip install -r requirements.txt
-streamlit run app.py
+streamlit run demo.py
 ```
+
+Or: `streamlit run app.py` (redirects to demo)
 
 ## For Headstorm AI Interview
 
