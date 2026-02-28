@@ -13,13 +13,25 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Sidebar Navigation (at top of sidebar)
+# Section 1: Navigation (top)
 st.sidebar.title("Navigation")
 page = st.sidebar.radio("Go to", [
     "1. Framework & Architecture",
     "2. Baseline Assessment (M2)",
     "3. Scaling Ready (M3)"
 ])
+
+# Section 2: Demo
+st.sidebar.divider()
+st.sidebar.subheader("Demo")
+st.sidebar.page_link("pages/1_Framework_Details.py", label="Framework Details", icon=":material/architecture:")
+st.sidebar.page_link("pages/2_Consultant_Workflow.py", label="Consultant Workflow", icon=":material/work:")
+st.sidebar.page_link("pages/3_Developer_Experience.py", label="Developer Experience", icon=":material/code:")
+
+# Section 3: App (last)
+st.sidebar.divider()
+st.sidebar.subheader("App")
+st.sidebar.page_link("app.py", label="Home", icon=":material/home:")
 
 # Load the selected page
 nav_dir = Path(__file__).parent / "nav_pages"

@@ -284,6 +284,92 @@ if st.button("Generate Comprehensive Maturity Assessment", type="primary"):
     if current_score < 15:
         st.warning("**Adoption Priority:** Focus on training and confidence-building before scaling. High rework indicates need for scaffolding.")
 
+# AI ADOPTION MATURITY MATRIX - Insert after assessment results, before Three Actors section
+st.divider()
+st.header("AI Adoption Maturity Matrix", divider=True)
+st.markdown("**Begin with the end in mind:** This framework engineers progression from baseline chaos to autonomous governance through measurable entropy reduction.")
+
+matrix_cols = st.columns(4)
+
+with matrix_cols[0]:
+    st.markdown(f"""
+    <div style='background-color: {MATURITY_COLORS["M1"]}20; padding: 15px; border-radius: 5px; border-left: 5px solid {MATURITY_COLORS["M1"]}; height: 300px;'>
+        <h4 style='color: {MATURITY_COLORS["M1"]}; margin-top: 0;'>M1: Chaos</h4>
+        <p><strong>Exploration</strong></p>
+        <div style='background-color: {MATURITY_COLORS["M1"]}; color: white; padding: 5px 10px; border-radius: 3px; display: inline-block; margin: 10px 0;'>
+            Entropy > 70
+        </div>
+        <p style='font-style: italic; font-size: 0.9em; margin: 10px 0;'>
+            "The Wild West": Copilot writes code that breaks production; no zoning.
+        </p>
+        <p style='font-weight: bold; margin-top: 15px; font-size: 0.9em;'>
+            High Rework & Tech Debt
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+
+with matrix_cols[1]:
+    current_badge = "<div style='position: absolute; top: -10px; right: 10px; background-color: #FF8C00; color: white; padding: 2px 8px; border-radius: 10px; font-size: 0.7em; font-weight: bold;'>CURRENT BASELINE</div>"
+    st.markdown(f"""
+    <div style='background-color: {MATURITY_COLORS["M2"]}20; padding: 15px; border-radius: 5px; border-left: 5px solid {MATURITY_COLORS["M2"]}; height: 300px; position: relative;'>
+        {current_badge}
+        <h4 style='color: {MATURITY_COLORS["M2"]}; margin-top: 0;'>M2: Shallow</h4>
+        <p><strong>Installation</strong></p>
+        <div style='background-color: {MATURITY_COLORS["M2"]}; color: white; padding: 5px 10px; border-radius: 3px; display: inline-block; margin: 10px 0;'>
+            Entropy 50 - 70
+        </div>
+        <p style='font-style: italic; font-size: 0.9em; margin: 10px 0;'>
+            "Guided Learning": MCP blocks Red Zone edits; basic VTCO in place.
+        </p>
+        <p style='font-weight: bold; margin-top: 15px; font-size: 0.9em;'>
+            Standardized Tooling
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+
+with matrix_cols[2]:
+    target_badge = "<div style='position: absolute; top: -10px; right: 10px; background-color: #0066CC; color: white; padding: 2px 8px; border-radius: 10px; font-size: 0.7em; font-weight: bold;'>TARGET STATE</div>"
+    st.markdown(f"""
+    <div style='background-color: {MATURITY_COLORS["M3"]}20; padding: 15px; border-radius: 5px; border-left: 5px solid {MATURITY_COLORS["M3"]}; height: 300px; position: relative;'>
+        {target_badge}
+        <h4 style='color: {MATURITY_COLORS["M3"]}; margin-top: 0;'>M3: Agentic</h4>
+        <p><strong>Integration</strong></p>
+        <div style='background-color: {MATURITY_COLORS["M3"]}; color: white; padding: 5px 10px; border-radius: 3px; display: inline-block; margin: 10px 0;'>
+            Entropy 30 - 50
+        </div>
+        <p style='font-style: italic; font-size: 0.9em; margin: 10px 0;'>
+            "The Guardrail": MCP suggests patterns; Entropy logged per commit.
+        </p>
+        <p style='font-weight: bold; margin-top: 15px; font-size: 0.9em;'>
+            106x Faster Lead Time
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+
+with matrix_cols[3]:
+    st.markdown(f"""
+    <div style='background-color: {MATURITY_COLORS["M4"]}20; padding: 15px; border-radius: 5px; border-left: 5px solid {MATURITY_COLORS["M4"]}; height: 300px;'>
+        <h4 style='color: {MATURITY_COLORS["M4"]}; margin-top: 0;'>M4: Autonomous</h4>
+        <p><strong>Optimization</strong></p>
+        <div style='background-color: {MATURITY_COLORS["M4"]}; color: white; padding: 5px 10px; border-radius: 3px; display: inline-block; margin: 10px 0;'>
+            Entropy < 15
+        </div>
+        <p style='font-style: italic; font-size: 0.9em; margin: 10px 0;'>
+            "Invisible Governance": High-quality code is auto-approved; zero "Bloat."
+        </p>
+        <p style='font-weight: bold; margin-top: 15px; font-size: 0.9em;'>
+            208x More Deployments
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+
+st.markdown("""
+<p style='text-align: center; color: #666; margin-top: 20px; font-style: italic;'>
+    The consulting engagement engineers the transition from M2 (baseline) to M3/M4 (target) through systematic entropy reduction.
+</p>
+""", unsafe_allow_html=True)
+st.divider()
+
 # THREE ACTORS IN GOVERNANCE (Demo-Ready Version)
 st.header("Three Actors in Governance", divider=True)
 
@@ -313,8 +399,12 @@ with st.expander("**Zubia** — AI Training Consultant (8-week engagement)", exp
 
     st.info("\"*I build the system that protects your experts, then I leave.*\"")
 
-    with st.expander("? My Methodology"):
-        st.write("Workforce development + ML systems. I bring the governance framework, configure the technical infrastructure, and enable your champions to scale without me.")
+    st.markdown("""
+    <details style='margin-top: 10px;'>
+        <summary style='cursor: pointer; font-weight: 500;'>? My Methodology</summary>
+        <p style='margin: 8px 0 0 0; font-size: 0.9em;'>Workforce development + ML systems. I bring the governance framework, configure the technical infrastructure, and enable your champions to scale without me.</p>
+    </details>
+    """, unsafe_allow_html=True)
 
 # Actor 2: MCP Server - In Expander
 with st.expander("**MCP Server** — Technical Enforcer (Local Python script)", expanded=False):
@@ -340,8 +430,12 @@ with st.expander("**MCP Server** — Technical Enforcer (Local Python script)", 
 
     st.info("\"*Not a data center. One Python file. USB-C for AI.*\"")
 
-    with st.expander("? Technical Reality"):
-        st.write("The Model Context Protocol is a local script that Cursor/Copilot call for context. It's lightweight, standardized, and runs on the developer's machine—not cloud infrastructure.")
+    st.markdown("""
+    <details style='margin-top: 10px;'>
+        <summary style='cursor: pointer; font-weight: 500;'>? Technical Reality</summary>
+        <p style='margin: 8px 0 0 0; font-size: 0.9em;'>The Model Context Protocol is a local script that Cursor/Copilot call for context. It's lightweight, standardized, and runs on the developer's machine—not cloud infrastructure.</p>
+    </details>
+    """, unsafe_allow_html=True)
 
 # Actor 3: Champion - In Expander
 with st.expander("**Champion** — Your Domain Expert (Protected & Enabled)", expanded=False):
@@ -367,8 +461,12 @@ with st.expander("**Champion** — Your Domain Expert (Protected & Enabled)", ex
 
     st.info("\"*Your most expensive expertise. Amplified, not replaced. Protected from burnout.*\"")
 
-    with st.expander("? Champion Protection"):
-        st.write("MCP filters noise so only true Red Zone decisions reach them. They spend 65% time on innovation (not gatekeeping) by M3.")
+    st.markdown("""
+    <details style='margin-top: 10px;'>
+        <summary style='cursor: pointer; font-weight: 500;'>? Champion Protection</summary>
+        <p style='margin: 8px 0 0 0; font-size: 0.9em;'>MCP filters noise so only true Red Zone decisions reach them. They spend 65% time on innovation (not gatekeeping) by M3.</p>
+    </details>
+    """, unsafe_allow_html=True)
 
 # Visual Summary (Compact)
 st.divider()
