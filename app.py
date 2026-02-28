@@ -317,114 +317,89 @@ if page == "1. Framework & Architecture":
             st.warning("**Adoption Priority:** Focus on training and confidence-building before scaling. High rework indicates need for scaffolding.")
         st.balloons()
 
-    # Three Roles Section - IMPROVED LAYOUT
-    st.header("The Three Roles Architecture", divider=True)
+    # THREE ACTORS IN GOVERNANCE (Streamlit-native, no HTML)
+    st.header("Three Actors in Governance", divider=True)
 
-    with st.container():
-        role_col1, role_col2, role_col3 = st.columns([1, 1, 1], gap="medium")
-        
-        with role_col1:
-            st.markdown("""
-            <div style='background-color: #4169E120; padding: 20px; border-radius: 10px; border-left: 5px solid #4169E1; min-height: 500px;'>
-                <h3 style='color: #4169E1; margin-top: 0;'>🎯 AI Training Consultant</h3>
-                <p><strong>You/The Consultant</strong></p>
-                <hr style='margin: 10px 0;'>
-                
-                <p><strong>What You Do:</strong></p>
-                <ul style='padding-left: 20px;'>
-                    <li>Assess M1-M4 maturity</li>
-                    <li>Architect zone structure</li>
-                    <li>Facilitate champion workshops</li>
-                    <li>Configure MCP server</li>
-                    <li>Train champions (teach teachers)</li>
-                    <li>Build entropy dashboards</li>
-                    <li>EXIT at M3/M4</li>
-                </ul>
-                
-                <p style='margin-top: 20px;'><strong>What You DON'T Do:</strong></p>
-                <ul style='padding-left: 20px; color: #DC143C;'>
-                    <li>❌ Write production code</li>
-                    <li>❌ Make architectural decisions</li>
-                    <li>❌ Enforce rules daily</li>
-                    <li>❌ Stay forever</li>
-                </ul>
-                
-                <p style='margin-top: 20px; font-style: italic; font-size: 0.9em;'>
-                "I build the system that protects your experts, then I leave."
-                </p>
-            </div>
-            """, unsafe_allow_html=True)
-            
-            with st.expander("? Consultant Role Details"):
-                st.write("The consultant brings methodology, MCP configuration, and change management expertise. Sets up the system in 2-3 weeks, then fades to quarterly check-ins. Lean consulting: maximum impact, minimum footprint.")
-        
-        with role_col2:
-            st.markdown("""
-            <div style='background-color: #70809020; padding: 20px; border-radius: 10px; border-left: 5px solid #708090; min-height: 500px;'>
-                <h3 style='color: #708090; margin-top: 0;'>🤖 MCP Server</h3>
-                <p><strong>The Technical Enforcer</strong></p>
-                <hr style='margin: 10px 0;'>
-                
-                <p><strong>What It Does:</strong></p>
-                <ul style='padding-left: 20px;'>
-                    <li>Guards Red Zone files (blocks unauthorized edits)</li>
-                    <li>Scaffolds based on skill (Novice=verbose, Expert=terse)</li>
-                    <li>Counts entropy metrics automatically</li>
-                    <li>Reminds of VTCO constraints</li>
-                    <li>Blocks commits violating rules</li>
-                </ul>
-                
-                <p style='margin-top: 20px;'><strong>What It CANNOT Do:</strong></p>
-                <ul style='padding-left: 20px; color: #DC143C;'>
-                    <li>❌ Know business priority</li>
-                    <li>❌ Write tribal knowledge</li>
-                    <li>❌ Judge promotion readiness</li>
-                    <li>❌ Build trust with humans</li>
-                    <li>❌ Override emergencies</li>
-                </ul>
-                
-                <p style='margin-top: 20px; font-style: italic; font-size: 0.9em;'>
-                "Not a data center. One Python file. The 'server' just means it responds to requests."
-                </p>
-            </div>
-            """, unsafe_allow_html=True)
-            
-            with st.expander("? MCP Server Reality"):
-                st.write("The Model Context Protocol is like a USB-C port for AI. Standardized, lightweight, local. The MCP server is a Python script running on the developer's machine—not cloud infrastructure. It exposes 'tools' that AI assistants call to check zones, validate code, and log metrics.")
-        
-        with role_col3:
-            st.markdown("""
-            <div style='background-color: #DAA52020; padding: 20px; border-radius: 10px; border-left: 5px solid #DAA520; min-height: 500px;'>
-                <h3 style='color: #DAA520; margin-top: 0;'>👑 Champion</h3>
-                <p><strong>The Human Expert</strong></p>
-                <hr style='margin: 10px 0;'>
-                
-                <p><strong>What They Own:</strong></p>
-                <ul style='padding-left: 20px;'>
-                    <li>Red Zone Decisions (veto power)</li>
-                    <li>Tribal Knowledge (VTCO docs)</li>
-                    <li>Skill Assessment (Novice vs Expert)</li>
-                    <li>Mentoring (human coaching)</li>
-                    <li>Governance Override (emergencies)</li>
-                    <li>Pattern Definition ("our way")</li>
-                </ul>
-                
-                <p style='margin-top: 20px;'><strong>What They DON'T Do:</strong></p>
-                <ul style='padding-left: 20px; color: #DC143C;'>
-                    <li>❌ Manual enforcement (MCP blocks automatically)</li>
-                    <li>❌ 20-page docs (VTCO is structured YAML)</li>
-                    <li>❌ Review boilerplate (Green Zone automated)</li>
-                    <li>❌ 24/7 availability (protected time)</li>
-                </ul>
-                
-                <p style='margin-top: 20px; font-style: italic; font-size: 0.9em;'>
-                "The most expensive expertise. Amplified, not replaced. Protected from burnout."
-                </p>
-            </div>
-            """, unsafe_allow_html=True)
-            
-            with st.expander("? Champion Protection"):
-                st.write("Champions are protected from burnout by MCP automation (filters noise) and by the framework (only true Red Zone decisions reach them). Their authority is formalized via CODEOWNERS and governance charter—executive-backed, not 'extra duties as assigned'.")
+    actor_col1, actor_col2, actor_col3 = st.columns([1, 1, 1], gap="large")
+
+    with actor_col1:
+        st.subheader("AI Training Consultant")
+        st.caption("You/The Consultant")
+        st.divider()
+
+        st.write("**What You Do:**")
+        st.write("• Assess M1-M4 maturity levels")
+        st.write("• Architect zone structure (Red/Yellow/Green)")
+        st.write("• Facilitate champion workshops")
+        st.write("• Configure MCP server")
+        st.write("• Train champions (teach the teachers)")
+        st.write("• Build entropy dashboards")
+        st.write("• EXIT at M3/M4 (consultant fades)")
+
+        st.write("")
+        st.write("**What You DON'T Do:**")
+        st.write("• Write production code")
+        st.write("• Make architectural decisions")
+        st.write("• Enforce rules daily")
+        st.write("• Stay forever (lean consulting)")
+
+        st.write("")
+        st.info("\"I build the system that protects your experts, then I leave.\"")
+
+        with st.expander("? Consultant Details"):
+            st.write("Brings methodology, MCP configuration, and change management. Sets up system in 2-3 weeks, then fades to quarterly check-ins.")
+
+    with actor_col2:
+        st.subheader("MCP Server")
+        st.caption("The Technical Enforcer")
+        st.divider()
+
+        st.write("**What It Does:**")
+        st.write("• Guards Red Zone files (blocks unauthorized edits)")
+        st.write("• Scaffolds based on skill (Novice=verbose, Expert=terse)")
+        st.write("• Counts entropy metrics automatically")
+        st.write("• Reminds of VTCO constraints")
+        st.write("• Blocks commits violating rules")
+
+        st.write("")
+        st.write("**What It CANNOT Do:**")
+        st.write("• Know business priority (champions decide this)")
+        st.write("• Write tribal knowledge (champions author this)")
+        st.write("• Judge promotion readiness (champions assess this)")
+        st.write("• Build trust with humans (champions do this)")
+        st.write("• Override emergencies (champions govern this)")
+
+        st.write("")
+        st.info("\"Not a data center. One Python file. The 'server' just means it responds to Cursor/Copilot requests.\"")
+
+        with st.expander("? MCP Details"):
+            st.write("The Model Context Protocol is like USB-C for AI. Lightweight, local, standardized. Exposes 'tools' that AI assistants call to check zones and validate code.")
+
+    with actor_col3:
+        st.subheader("Champion")
+        st.caption("The Human Expert")
+        st.divider()
+
+        st.write("**What They Own:**")
+        st.write("• Red Zone Decisions (veto power)")
+        st.write("• Tribal Knowledge (VTCO docs)")
+        st.write("• Skill Assessment (Novice vs Expert)")
+        st.write("• Mentoring (human coaching)")
+        st.write("• Governance Override (emergency judgment)")
+        st.write("• Pattern Definition (\"our way\")")
+
+        st.write("")
+        st.write("**What They DON'T Do:**")
+        st.write("• Manual enforcement (MCP blocks automatically)")
+        st.write("• 20-page docs (VTCO is structured YAML)")
+        st.write("• Review boilerplate (Green Zone is automated)")
+        st.write("• 24/7 availability (protected time)")
+
+        st.write("")
+        st.info("\"The most expensive expertise. Amplified, not replaced. Protected from becoming a bottleneck.\"")
+
+        with st.expander("? Champion Details"):
+            st.write("Protected from burnout by MCP automation. Authority formalized via CODEOWNERS. Only true Red Zone decisions reach them.")
 
     # Protection Architecture - IMPROVED
     st.header("Protection Architecture", divider=True)
