@@ -1,10 +1,12 @@
 {
   "mcpServers": {
     "ai-governance": {
-      "command": "python",
-      "args": ["mcp_server.py"],
+      "command": "C:\\Users\\zumah\\AppData\\Local\\Programs\\Python\\Python311\\python.exe",
+      "args": [
+        "C:\\Users\\zumah\\ai-governance-demo\\mcp_server.py"
+      ],
       "env": {
-        "GOVERNANCE_REPO_PATH": ".",
+        "GOVERNANCE_REPO_PATH": "C:\\Users\\zumah\\ai-governance-demo",
         "LOG_LEVEL": "INFO"
       },
       "disabled": false,

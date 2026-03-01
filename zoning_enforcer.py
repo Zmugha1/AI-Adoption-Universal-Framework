@@ -72,17 +72,36 @@ def determine_zone(
 ) -> str:
     """
     Determine zone (Red, Yellow, Green) for a file and phase.
-    Red takes precedence (compliance boundaries), then Yellow, then Green.
+    Priority: Green (explicit safe paths) > Red (dangerous) > Phase-based > Yellow default.
     """
-    # Check Red Zone patterns first (codeowner_pattern or red_zone_patterns)
+    norm = _normalize_path(file_path)
+
+    # 1. EXPLICIT GREEN PATTERNS (checked first - tests, docs, utils are safe)
+    green_patterns = rules.get("green_zone_patterns", [])
+    if green_patterns and _path_matches_any(file_path, green_patterns):
+        logger.info("Zone detection: %s -> Green (explicit green pattern)", file_path)
+        return "Green"
+
+    # 2. YELLOW ZONE PATTERNS (medium risk - api, services, integration)
+    yellow_patterns = rules.get("yellow_zone_patterns", [])
+    if yellow_patterns and _path_matches_any(file_path, yellow_patterns):
+        logger.info("Zone detection: %s -> Yellow (explicit yellow pattern)", file_path)
+        return "Yellow"
+
+    # 3. RED ZONE PATTERNS (dangerous paths - but tests/ overrides)
     red_zone = rules.get("zones", {}).get("red", {})
     red_patterns = rules.get("red_zone_patterns", [])
     if isinstance(red_zone, dict) and red_zone.get("codeowner_pattern"):
         red_patterns = red_zone["codeowner_pattern"].split()
-    if _path_matches_any(file_path, red_patterns):
+    if red_patterns and _path_matches_any(file_path, red_patterns):
+        # Even if path looks red, test files stay Green
+        if _path_matches_any(file_path, ["tests/**", "test/**"]):
+            logger.info("Zone detection: %s -> Green (test file overrides red pattern)", file_path)
+            return "Green"
+        logger.info("Zone detection: %s -> Red (red zone pattern)", file_path)
         return "Red"
 
-    # Phase-based zone lookup
+    # 4. Phase-based zone lookup
     zones = rules.get("zones", {})
     phase_lower = (sdlc_phase or "").lower()
 
@@ -92,7 +111,9 @@ def determine_zone(
         phases = zone_config.get("sdlc_phases", [])
         for p in phases:
             if phase_lower in p.lower():
-                return zone_name.capitalize()
+                zone = zone_name.capitalize()
+                logger.info("Zone detection: %s -> %s (phase %s matches %s)", file_path, zone, phase_lower or "inferred", p)
+                return zone
 
     # Fallback: use file path mapping
     mapping = rules.get("file_path_mapping", {})
@@ -104,9 +125,12 @@ def determine_zone(
             phases = zone_config.get("sdlc_phases", [])
             for p in phases:
                 if inferred.lower() in p.lower():
+                    zone = zone_name.capitalize()
+                    logger.info("Zone detection: %s -> %s (inferred phase %s matches %s)", file_path, zone, inferred, p)
                     return zone_name.capitalize()
 
     # Default to Yellow (safer than Green for unknown)
+    logger.info("Zone detection: %s -> Yellow (default)", file_path)
     return "Yellow"
 
 

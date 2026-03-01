@@ -100,6 +100,32 @@ file_path_mapping:
     - "**/monitoring/**"
     - "**/alerts/**"
 
+# Green zone file patterns (checked FIRST - safe, reversible, standard)
+green_zone_patterns:
+  - "tests/**"
+  - "test/**"
+  - "docs/**"
+  - "doc/**"
+  - "src/utils/**"
+  - "scripts/**"
+  - "**/*.md"
+  - "**/*.txt"
+  - "README*"
+  - ".github/**"
+  - "fixtures/**"
+  - "mocks/**"
+
+# Yellow zone file patterns (medium risk - checked after Green, before Red)
+yellow_zone_patterns:
+  - "src/api/**"
+  - "src/services/**"
+  - "src/controllers/**"
+  - "src/controller/**"
+  - "src/integration/**"
+  - "src/models/**"
+  - "src/model/**"
+  - "lib/**"
+
 # Red zone file patterns (CODEOWNERS-style)
 red_zone_patterns:
   - "**/payment/**"

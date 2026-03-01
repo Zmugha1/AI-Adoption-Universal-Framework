@@ -1,0 +1,29 @@
+domain: "production_database"
+champion_owner: "Senior_Architect_01"
+sdlc_phase: "Design-Database"
+last_validated: "2026-02-28"
+
+vtco_definition:
+  verb: "Modify"
+  task: "Alter existing table schema or add new indexed columns"
+  constraints:
+    technical:
+      - "No destructive migrations (DROP) without a verified rollback script"
+      - "All new columns must be NULLABLE initially to prevent locking large tables"
+      - "Indexes must follow the naming convention: idx_[table]_[column]"
+      - "Max execution time for migration scripts: 30 seconds"
+  outcome: "Schema updated with zero downtime and verified rollback path"
+
+governance_rules:
+  zone: "Red"
+  m_level_requirement: "M4"
+  ai_behavior:
+    on_violation: "Block and trigger ADR (Architectural Decision Record)"
+    scaffolding: "Explain the locking risks of ALTER TABLE to the user"
+
+# Domain-to-file mapping (for auto-lookup)
+domain_mapping:
+  - "**/migrations/**"
+  - "**/migration/**"
+  - "**/schema/**"
+  - "**/ddl/**"

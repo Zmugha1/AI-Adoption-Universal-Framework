@@ -21,41 +21,35 @@ This simulator demonstrates the Three-Actors governance in action.
 st.divider()
 
 
+def _zone_from_path(file_path: str) -> str:
+    """Zone detection - matches zoning_enforcer priority: Green > Red > Yellow."""
+    path = file_path.replace("\\", "/")
+
+    # 1. GREEN FIRST (explicitly safe)
+    if re.search(r"^tests?/|^docs?/|^src/utils/|\.md$|fixtures/|mocks/", path, re.IGNORECASE):
+        return "Green"
+
+    # 2. RED (dangerous)
+    if re.search(r"migrations?/|schema/|config/production|src/payment/|src/security/|ddl/", path, re.IGNORECASE):
+        # Double-check: tests override Red
+        if re.search(r"^tests?/", path, re.IGNORECASE):
+            return "Green"
+        return "Red"
+
+    # 3. YELLOW (medium risk)
+    if re.search(r"src/api/|src/services/|src/integration/|lib/", path, re.IGNORECASE):
+        return "Yellow"
+
+    return "Yellow"  # Default safe
+
+
 def detect_zone(file_path: str, complexity: int, role: str) -> dict:
     """
     Simulate MCP zoning logic.
     Returns: zone, zone_color, allowed, scaffolding, required_approver, message
     """
-    red_patterns = [
-        r".*migrations/.*\.sql",
-        r".*schema/.*\.sql",
-        r".*config/production/.*",
-        r".*security/.*",
-        r".*payment/.*",
-        r".*ddl.*\.sql",
-    ]
-    yellow_patterns = [
-        r".*api/.*\.py",
-        r".*integration/.*",
-        r".*services/.*",
-        r".*controllers/.*",
-    ]
-
-    zone = "Green"
-    zone_color = ZONE_COLORS["Green"]
-
-    for pattern in red_patterns:
-        if re.search(pattern, file_path.replace("\\", "/")):
-            zone = "Red"
-            zone_color = ZONE_COLORS["Red"]
-            break
-
-    if zone == "Green":
-        for pattern in yellow_patterns:
-            if re.search(pattern, file_path.replace("\\", "/")):
-                zone = "Yellow"
-                zone_color = ZONE_COLORS["Yellow"]
-                break
+    zone = _zone_from_path(file_path)
+    zone_color = ZONE_COLORS[zone]
 
     allowed = True
     required_approver = None
@@ -135,8 +129,8 @@ with config_col1:
 with config_col2:
     test_file_path = st.text_input(
         "File Path to Test",
-        value="src/utils/helpers.py",
-        help="Examples: migrations/schema.sql (Red), src/api/client.py (Yellow), src/utils/helpers.py (Green)",
+        value="tests/test_utils.py",
+        help="Examples: tests/test_utils.py (Green), migrations/schema.sql (Red), src/api/client.py (Yellow)",
     )
 
 with config_col3:
@@ -353,10 +347,10 @@ with st.sidebar:
     st.divider()
     st.header("Testing Guide")
     st.markdown("""
-    **Zone Patterns:**
-    - **Red**: `migrations/`, `schema/`, `config/production/`, `security/`, `payment/`
-    - **Yellow**: `api/`, `integration/`, `services/`, `controllers/`
-    - **Green**: `utils/`, `helpers/`, `tests/`, `docs/`
+    **Zone Patterns (priority: Green > Red > Yellow):**
+    - **Green**: `tests/`, `docs/`, `src/utils/`, `*.md`, `fixtures/`, `mocks/`
+    - **Red**: `migrations/`, `schema/`, `config/production`, `src/payment/`, `src/security/`, `ddl/`
+    - **Yellow**: `src/api/`, `src/services/`, `src/integration/`, `lib/`
 
     **Role Limits:**
     - Novice: Complexity <= 5

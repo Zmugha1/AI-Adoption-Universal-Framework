@@ -167,9 +167,15 @@ async def _check_zoning_permission(args: dict[str, Any]) -> dict[str, Any]:
         "message": message,
     }
 
-    # Add VTCO context when Red Zone (for Cursor to surface tribal knowledge)
+    # Add VTCO context when Red Zone (path-based lookup, not default payment)
     if zone == "Red":
-        vtco = _load_vtco_for_domain("payment_processing") or _load_vtco_for_domain("production_database")
+        domain = _find_domain_for_path(file_path)
+        if domain:
+            vtco = _load_vtco_for_domain(domain)
+        elif "migration" in file_path or "schema" in file_path or "migrations" in file_path:
+            vtco = _load_vtco_for_domain("production_database")
+        else:
+            vtco = _load_vtco_for_domain("payment_processing") or _load_vtco_for_domain("production_database")
         if not vtco and ("migration" in file_path or "schema" in file_path):
             vtco = {
                 "domain": "production_database",
