@@ -375,7 +375,7 @@ st.header("Pre-Project Kickoff Workshop", divider=True)
 st.markdown("""
 **90-Minute Facilitated Session**: From assessment to implementation plan  
 **Participants**: SME Champions, Tech Lead, Engineering Manager  
-**Your Role**: AI Training Consultant guiding the workshop
+**My Role**: AI Training Consultant guiding the workshop
 """)
 
 if 'workshop_phase' not in st.session_state:
