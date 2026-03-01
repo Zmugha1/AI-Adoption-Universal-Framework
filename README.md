@@ -98,6 +98,3 @@ pip install -r requirements-mcp.txt
 pytest tests/ -v
 ```
 
-## For Headstorm AI Interview
-
-February 2026

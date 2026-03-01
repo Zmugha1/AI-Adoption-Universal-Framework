@@ -38,11 +38,11 @@ with st.expander("Week 0: Discovery & Baseline Establishment", expanded=False):
         "Category": ["Activity", "Data Inputs", "Deliverables", "Evidence/Metrics", "MCP Mode", "Key Decisions"],
         "Details": [
             "Pre-engagement assessment and architecture mapping",
-            "AI Readiness Assessment (30 questions) → assessment_baseline.json; Repo file structure (find . -type f | grep -E '\\.(py|sql|yml|yaml)$') → file_structure_inventory.json; Champion interviews (3-5 champions, 30 min each) → champion_profiles.yaml; Incident history (last 90 days) → incident_heatmap.json",
+            "AI Readiness Assessment (30 questions) → assessment_baseline.json; Repo file structure (find . -type f | grep -E '\\.(py|sql|yml|yaml)$') → file_structure_inventory.json; Champion sessions (3-5 champions, 30 min each) → champion_profiles.yaml; Incident history (last 90 days) → incident_heatmap.json",
             "assessment_baseline.json, champion_profiles.yaml, file_structure_inventory.json, week0_discovery_report.md",
             "Self-reported entropy: 68/100 (typical M2); Adoption rate: 22%; Champion coverage: 0%; Red Zone candidates from incident analysis",
             "Not deployed",
-            "Which 3-5 domains need VTCO first? (Prioritize incident frequency × business impact); Initial zone mapping validated against interview data; Champion availability confirmed for Week 1 shadow sessions"
+            "Which 3-5 domains need VTCO first? (Prioritize incident frequency × business impact); Initial zone mapping validated against assessment data; Champion availability confirmed for Week 1 shadow sessions"
         ]
     })
     st.dataframe(week0_data, use_container_width=True, hide_index=True)
@@ -66,7 +66,7 @@ with st.expander("Week 1: Silent Observation (The Learning Week)", expanded=Fals
         ]
     })
     st.dataframe(week1_data, use_container_width=True, hide_index=True)
-    st.info("**Key Insight**: We don't guess—Week 1 observation validates Week 0 interview assumptions.")
+    st.info("**Key Insight**: We don't guess—Week 1 observation validates Week 0 assessment assumptions.")
 
 st.divider()
 
@@ -98,7 +98,7 @@ with st.expander("Week 3: VTCO Deep Dive & Role Acceleration", expanded=False):
         "Category": ["Activity", "Data Inputs", "Deliverables", "Evidence/Metrics", "MCP Mode", "Key Decisions"],
         "Details": [
             "Champion VTCO workshop (2 hours), SMART goal tracking begins, formal mentor pairing",
-            "Champion domain expertise interviews (VTCO extraction); violations.jsonl pattern analysis; scaffolding_adjustments.jsonl; Shadow follow-ups (2 developers); SMART goal tracking",
+            "Champion domain expertise sessions (VTCO extraction); violations.jsonl pattern analysis; scaffolding_adjustments.jsonl; Shadow follow-ups (2 developers); SMART goal tracking",
             "3-5 vtco_[domain].yaml files; tribal_knowledge_index.json; smart_goals_progress.json; mentoring_log.jsonl; promotion_candidates.json",
             "VTCO coverage: 100% of Red Zones; SMART goal achievement: 60% on track; Auto-promotions: 2+ Novices → Intermediate; Champion time: review hours dropping; Entropy: continuing downward",
             "Full enforcement + VTCO context surfacing (show relevant VTCO when Red Zone blocked)",
@@ -215,7 +215,7 @@ st.header("Key Narrative Points", divider=True)
 
 col1, col2 = st.columns(2)
 with col1:
-    st.info("**We don't guess**: Week 1 observation validates Week 0 interview assumptions.")
+    st.info("**We don't guess**: Week 1 observation validates Week 0 assessment assumptions.")
     st.info("**Tribal knowledge protection**: VTCOs drafted Week 1-3, actively governing Week 4+.")
 with col2:
     st.info("**Evidence-based calibration**: Week 2 thresholds come from Week 1 telemetry, not arbitrary numbers.")
@@ -230,13 +230,13 @@ st.divider()
 st.header("Data Flow Diagram", divider=True)
 st.markdown("""
 ```
-Week 0-1: Interview Data + MCP Telemetry → Calibrated Zone Map
+Week 0-1: Assessment Data + MCP Telemetry → Calibrated Zone Map
 Week 2-3: Violation Logs + Champion Feedback → Adjusted Thresholds + VTCOs
 Week 4+:  Entropy Logs + VTCO Effectiveness → Optimized Governance + M3 Validation
 ```
 """)
 st.code("""
-Interview Data (Week 0)     MCP Telemetry (Week 1)     Champion Feedback (Week 2-3)
+Assessment Data (Week 0)     MCP Telemetry (Week 1)     Champion Feedback (Week 2-3)
         │                            │                            │
         └────────────────────────────┼────────────────────────────┘
                                      ▼
@@ -290,7 +290,7 @@ framework_export = {
         {"week": 8, "name": "Consultant Exit", "mcp_mode": "self-sustaining"}
     ],
     "data_flow": {
-        "week_0_1": "Interview Data + MCP Telemetry → Calibrated Zone Map",
+        "week_0_1": "Assessment Data + MCP Telemetry → Calibrated Zone Map",
         "week_2_3": "Violation Logs + Champion Feedback → Adjusted Thresholds + VTCOs",
         "week_4_plus": "Entropy Logs + VTCO Effectiveness → Optimized Governance + M3 Validation"
     },

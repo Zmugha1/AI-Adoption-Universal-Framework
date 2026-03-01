@@ -423,7 +423,7 @@ async def _record_decision(args: dict[str, Any]) -> dict[str, Any]:
 # Tool 6: demo_red_zone_scenario
 # ---------------------------------------------------------------------------
 async def _demo_red_zone_scenario(_args: dict[str, Any]) -> dict[str, Any]:
-    """Run the complete Red Zone blocking demo for interview/demo."""
+    """Run the complete Red Zone blocking demo."""
     now = datetime.utcnow().isoformat() + "Z"
     adr_id = f"ADR-{datetime.utcnow().strftime('%Y-%m')}-001"
     timeline = [

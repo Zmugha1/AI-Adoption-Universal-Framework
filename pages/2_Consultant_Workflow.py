@@ -37,7 +37,7 @@ for item in timeline_data:
 st.header("Value Proposition", divider=True)
 
 st.markdown("""
-**For Headstorm AI Clients:**
+**For Clients:**
 
 1. **Consultant**: Brings methodology, configures MCP, trains champions, exits at Week 8
 2. **MCP Server**: One Python file, local execution, enforces governance automatically  

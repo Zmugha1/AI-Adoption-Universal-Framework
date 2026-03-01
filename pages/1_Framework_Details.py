@@ -40,11 +40,11 @@ with st.expander("Week 0: Discovery & Baseline Establishment", expanded=False):
         "Category": ["Activity", "Data Inputs", "Deliverables", "Evidence/Metrics", "MCP Mode", "Key Decisions"],
         "Details": [
             "Pre-engagement assessment, architecture mapping, champion identification",
-            "30-question AI Readiness Assessment; Repository file structure analysis; Champion interviews (3-5); Incident history review (90 days)",
+            "30-question AI Readiness Assessment; Repository file structure analysis; Champion sessions (3-5); Incident history review (90 days)",
             "assessment_baseline.json; champion_profiles.yaml; file_structure_inventory.json; incident_heatmap.json; week0_discovery_report.md",
             "Self-reported entropy: 68/100; Adoption rate: 22%; Champion coverage: 0% (identified but not documented); Red Zone candidates identified",
             "Not deployed",
-            "Which 3-5 domains need VTCO first (prioritize by incident frequency)? Initial zone mapping validated against interview data?"
+            "Which 3-5 domains need VTCO first (prioritize by incident frequency)? Initial zone mapping validated against assessment data?"
         ]
     }
     st.dataframe(pd.DataFrame(week0_data), use_container_width=True, hide_index=True)
@@ -93,7 +93,7 @@ with st.expander("Week 3: VTCO Deep Dive & Role Acceleration", expanded=False):
         "Category": ["Activity", "Data Inputs", "Deliverables", "Evidence/Metrics", "MCP Mode", "Key Decisions"],
         "Details": [
             "Champion VTCO workshop (2 hours); SMART goal tracking begins; Formal mentor pairing active",
-            "Champion domain expertise interviews (recorded); violations.jsonl (pattern analysis); scaffolding_adjustments.jsonl; Shadow follow-ups (2 developers); SMART goal daily tracking",
+            "Champion domain expertise sessions (recorded); violations.jsonl (pattern analysis); scaffolding_adjustments.jsonl; Shadow follow-ups (2 developers); SMART goal daily tracking",
             "3-5 vtco_[domain].yaml files (complete); tribal_knowledge_index.json; smart_goals_progress.json; mentoring_log.jsonl; promotion_candidates.json",
             "VTCO coverage: 100% of Red Zones; SMART goal achievement: 60% on track; Auto-promotions: 2+ Novices → Intermediate; Champion time: Review hours dropping; Entropy: Continuing downward trend",
             "Full enforcement + VTCO context surfacing (Red Zone blocks show relevant tribal knowledge constraints)",

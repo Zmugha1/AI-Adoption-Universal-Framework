@@ -32,6 +32,7 @@ def render_sidebar(use_nav_radio=True, nav_index=0):
     st.sidebar.page_link("pages/3_Developer_Experience.py", label="Developer Experience", icon=":material/code:")
     st.sidebar.page_link("pages/4_Zone_Testing.py", label="Zone Testing & Novice Simulator", icon=":material/science:")
     st.sidebar.page_link("pages/6_Week1_Calibration.py", label="Week 1 Calibration Report", icon=":material/assessment:")
+    st.sidebar.page_link("pages/7_Strategic_Planning.py", label="Week 1→2 Strategic Planning", icon=":material/insights:")
 
     # Section 3: App
     st.sidebar.divider()

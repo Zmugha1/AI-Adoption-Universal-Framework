@@ -43,7 +43,7 @@ with st.expander("📋 Week 1 Insights: From Observation to Action", expanded=Tr
 
     Every Green Zone file allowed. Every Red Zone file correctly flagged. The regex patterns and zone logic (migrations/, payment/, security/) accurately matched the client's risk topology.
 
-    **Insight**: Our Week 0 interview-based zone mapping was correct. Champions identified the right danger zones. The file path architecture aligned with tribal knowledge.
+    **Insight**: Our Week 0 assessment-based zone mapping was correct. Champions identified the right danger zones. The file path architecture aligned with tribal knowledge.
 
     **Week 2 Decision**: Flip `ENFORCEMENT_MODE` from `observation` to `active`. The system is calibrated. No "learning mode" buffer needed—we're not guessing.
 
@@ -77,7 +77,7 @@ with st.expander("📋 Week 1 Insights: From Observation to Action", expanded=Tr
 
     **Novice developers succeeded at complexity 5 tasks 75% of the time.**
 
-    The interview assumption (complexity 5 = Novice limit) held. No need to lower to 3 (too restrictive) or raise to 7 (too risky). The Goldilocks zone is confirmed.
+    The assessment assumption (complexity 5 = Novice limit) held. No need to lower to 3 (too restrictive) or raise to 7 (too risky). The Goldilocks zone is confirmed.
 
     **Insight**: Skill-based scaffolding works when data-validated. Not patronizing (cap 3) or dangerous (cap 10).
 
@@ -261,7 +261,7 @@ recommendations = {
 st.json({"recommendations": recommendations})
 
 st.info("""
-**Key phrases for the interview:**
+**Key phrases for the demo:**
 - *"I don't guess at thresholds—I observe behavior for a week, then calibrate."*
 - *"The MCP logs everything in JSONL format—machine-readable, append-only, auditable."*
 - *"Cursor accelerates my analysis—I ask it to find patterns in the telemetry, it writes the pandas code, I validate and deploy."*
