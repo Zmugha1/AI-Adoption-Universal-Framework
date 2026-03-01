@@ -8,6 +8,7 @@ import pytest
 
 from entropy_tracker import (
     calculate_entropy,
+    get_current_average,
     get_maturity_level,
     get_trend,
     log_entropy,
@@ -90,3 +91,22 @@ class TestLogEntropy:
             log_file = path / ".ai-governance" / "entropy_log.jsonl"
             lines = log_file.read_text().strip().split("\n")
             assert len(lines) == 2
+
+
+class TestGetCurrentAverage:
+    """Tests for get_current_average."""
+
+    def test_returns_average(self):
+        from datetime import datetime
+
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp)
+            now = datetime.utcnow().isoformat() + "Z"
+            log_entropy(path, {}, 10, "M3", now)
+            log_entropy(path, {}, 20, "M2", now)
+            avg = get_current_average(path, days=7)
+            assert avg == 15.0
+
+    def test_returns_none_when_no_log(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            assert get_current_average(Path(tmp)) is None

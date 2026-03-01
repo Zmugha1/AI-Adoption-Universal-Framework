@@ -16,7 +16,9 @@ import fnmatch
 import json
 import logging
 import os
+import sys
 import uuid
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
@@ -28,6 +30,7 @@ from mcp.server.stdio import stdio_server
 
 from entropy_tracker import (
     calculate_entropy,
+    get_current_average,
     get_maturity_level,
     get_trend,
     load_entropy_thresholds,
@@ -52,9 +55,11 @@ VIOLATIONS_LOG = GOV_DIR / "violations.jsonl"
 TRIBAL_KNOWLEDGE_DIR = GOV_DIR / "tribal-knowledge"
 LOG_LEVEL = os.environ.get("LOG_LEVEL", "INFO")
 
+# Log to stderr (stdio transport uses stdin/stdout for MCP protocol)
 logging.basicConfig(
     level=getattr(logging, LOG_LEVEL.upper(), logging.INFO),
-    format='{"timestamp": "%(asctime)s", "level": "%(levelname)s", "message": "%(message)s"}',
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    stream=sys.stderr,
 )
 logger = logging.getLogger("ai-governance-mcp")
 
@@ -143,7 +148,17 @@ async def _check_zoning_permission(args: dict[str, Any]) -> dict[str, Any]:
         allowed = True
         message = "[Observation] " + message
 
-    return {
+    # Log violation when blocked (for MCP enforcement audit trail)
+    if not allowed:
+        _log_violation({
+            "timestamp": datetime.utcnow().isoformat() + "Z",
+            "file_path": file_path,
+            "user_role": user_role,
+            "zone": zone,
+            "reason": message,
+        })
+
+    result: dict[str, Any] = {
         "allowed": allowed,
         "zone": zone,
         "required_approver": required_approver,
@@ -151,6 +166,20 @@ async def _check_zoning_permission(args: dict[str, Any]) -> dict[str, Any]:
         "constraints": constraints,
         "message": message,
     }
+
+    # Add VTCO context when Red Zone (for Cursor to surface tribal knowledge)
+    if zone == "Red":
+        vtco = _load_vtco_for_domain("payment_processing") or _load_vtco_for_domain("production_database")
+        if not vtco and ("migration" in file_path or "schema" in file_path):
+            vtco = {
+                "domain": "production_database",
+                "champion_owner": "Senior_Architect_01",
+                "constraints": ["No destructive migrations without rollback", "Use pt-online-schema-change for large tables"],
+                "ai_behavior": {"reminder": "RED ZONE - requires Champion approval"},
+            }
+        result["vtco_context"] = vtco
+
+    return result
 
 
 # ---------------------------------------------------------------------------
@@ -278,6 +307,12 @@ async def _calculate_entropy(args: dict[str, Any]) -> dict[str, Any]:
         "maturity_level": maturity,
         "trend": trend,
         "logged": logged,
+        "formula_breakdown": {
+            "bloat_contribution": round(bloat * 0.25, 2),
+            "rework_contribution": round(rework * 0.25, 2),
+            "reverts_contribution": round(revert * 0.20, 2),
+            "premature_contribution": round(premature * 0.30, 2),
+        },
     }
 
 
@@ -379,6 +414,45 @@ async def _record_decision(args: dict[str, Any]) -> dict[str, Any]:
 
 
 # ---------------------------------------------------------------------------
+# Tool 6: demo_red_zone_scenario
+# ---------------------------------------------------------------------------
+async def _demo_red_zone_scenario(_args: dict[str, Any]) -> dict[str, Any]:
+    """Run the complete Red Zone blocking demo for interview/demo."""
+    now = datetime.utcnow().isoformat() + "Z"
+    adr_id = f"ADR-{datetime.utcnow().strftime('%Y-%m')}-001"
+    timeline = [
+        {"step": 1, "actor": "Developer (Novice)", "action": "Request: ALTER TABLE users DROP COLUMN email;", "timestamp": now},
+        {"step": 2, "actor": "MCP Server", "action": "Zone Detection: File path 'migrations/2026_03_01_alter_users.sql'", "result": "Classified as Design-Database phase -> RED ZONE"},
+        {"step": 3, "actor": "MCP Server", "action": "VTCO Lookup: Loaded production_database rules", "result": "Zone: Red, M4 requirement, Champion: Senior_Architect_01"},
+        {"step": 4, "actor": "MCP Server", "action": "Permission Check: Novice role attempting Red Zone modification", "result": "BLOCKED - Role insufficient"},
+        {"step": 5, "actor": "MCP Server", "action": "Constraint Validation", "violations": ["Destructive operation (DROP) without rollback script", "Column removal violates data retention policy", "Novice cannot modify production schema"]},
+        {"step": 6, "actor": "MCP Server", "action": "Educational Intervention", "message": "ALTER TABLE on large tables causes exclusive locks. For the users table (2.3M rows), this would lock for ~4 minutes. Use pt-online-schema-change or soft delete first."},
+        {"step": 7, "actor": "MCP Server", "action": "ADR Creation", "adr_id": adr_id, "status": "Pending Senior_Architect_01 approval"},
+        {"step": 8, "actor": "Champion (Senior_Architect_01)", "action": "Notification sent", "options": ["Approve with rollback script attached", "Request modification (use soft delete)", "Schedule architecture review"]},
+    ]
+    return {
+        "scenario": "database_schema_change",
+        "timeline": timeline,
+        "outcome": {
+            "production_incident_prevented": True,
+            "downtime_avoided": "4 minutes",
+            "data_loss_prevented": True,
+            "education_delivered": "Developer learned about online schema changes",
+        },
+        "key_takeaway": "Red Zone protection prevented destructive change and educated developer on safe patterns.",
+    }
+
+
+# ---------------------------------------------------------------------------
+# Tool 7: get_current_entropy_average
+# ---------------------------------------------------------------------------
+async def _get_current_entropy_average(_args: dict[str, Any]) -> dict[str, Any]:
+    """Get 7-day rolling average entropy score from log."""
+    avg = get_current_average(REPO_PATH, days=7)
+    return {"7_day_average": avg, "days": 7}
+
+
+# ---------------------------------------------------------------------------
 # MCP Server Setup
 # ---------------------------------------------------------------------------
 app = Server(
@@ -459,6 +533,21 @@ TOOL_DEFS = [
             },
         },
     ),
+    types.Tool(
+        name="demo_red_zone_scenario",
+        description="Run demo of Red Zone governance protection (database schema change blocking).",
+        inputSchema={
+            "type": "object",
+            "properties": {
+                "scenario_type": {"type": "string", "description": "database_schema_change (default)"},
+            },
+        },
+    ),
+    types.Tool(
+        name="get_current_entropy_average",
+        description="Get 7-day rolling average entropy score from log.",
+        inputSchema={"type": "object", "properties": {}},
+    ),
 ]
 
 TOOL_HANDLERS = {
@@ -467,6 +556,8 @@ TOOL_HANDLERS = {
     "calculate_entropy": _calculate_entropy,
     "validate_code_patterns": _validate_code_patterns,
     "record_decision": _record_decision,
+    "demo_red_zone_scenario": lambda args: _demo_red_zone_scenario(args),
+    "get_current_entropy_average": _get_current_entropy_average,
 }
 
 

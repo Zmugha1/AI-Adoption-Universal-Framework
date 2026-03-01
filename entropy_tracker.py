@@ -131,6 +131,36 @@ def log_entropy(
         return False
 
 
+def get_current_average(repo_path: str | Path, days: int = 7) -> float | None:
+    """Calculate rolling average entropy score from log. Returns None if no data."""
+    repo = Path(repo_path)
+    log_path = repo / ".ai-governance" / "entropy_log.jsonl"
+    if not log_path.exists():
+        return None
+    cutoff = datetime.utcnow() - timedelta(days=days)
+    scores: list[float] = []
+    try:
+        with open(log_path, encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if not line:
+                    continue
+                try:
+                    entry = json.loads(line)
+                    ts = entry.get("timestamp", "")
+                    if ts:
+                        dt = datetime.fromisoformat(ts.replace("Z", "+00:00"))
+                        if dt.tzinfo:
+                            dt = dt.replace(tzinfo=None)
+                        if dt >= cutoff:
+                            scores.append(entry.get("score", 0))
+                except json.JSONDecodeError:
+                    continue
+    except OSError:
+        return None
+    return round(sum(scores) / len(scores), 2) if scores else None
+
+
 def load_entropy_thresholds(repo_path: str | Path) -> dict[str, float]:
     """Load entropy thresholds from governance_rules.yaml if present."""
     import yaml
