@@ -37,6 +37,15 @@ st.markdown("""
 st.title("Universal AI Governance Framework")
 st.subheader("Progressive Adoption & Entropy Management")
 
+# Direct link to 8-Week Implementation Playbook (home page)
+with st.container():
+    col1, col2 = st.columns([3, 1])
+    with col1:
+        st.markdown("**📋 8-Week Implementation Playbook** — Evidence-based consulting from M2 (Chaos) to M3 (Agentic). Week-by-week deliverables, data flows, and decision gates.")
+    with col2:
+        st.page_link("app.py", label="Open Playbook →", query_params={"nav": "4"})
+st.divider()
+
 # COMPREHENSIVE AI READINESS ASSESSMENT
 st.header("Comprehensive AI Readiness Assessment", divider=True)
 
