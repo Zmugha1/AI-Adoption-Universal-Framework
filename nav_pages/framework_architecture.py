@@ -8,7 +8,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import streamlit as st
 import pandas as pd
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from shared import MATURITY_COLORS, ZONE_COLORS, ROLE_COLORS
 
@@ -368,6 +368,382 @@ st.markdown("""
     The consulting engagement engineers the transition from M2 (baseline) to M3/M4 (target) through systematic entropy reduction.
 </p>
 """, unsafe_allow_html=True)
+st.divider()
+
+# PRE-PROJECT KICKOFF WORKSHOP SECTION
+st.header("Pre-Project Kickoff Workshop", divider=True)
+st.markdown("""
+**90-Minute Facilitated Session**: From assessment to implementation plan  
+**Participants**: SME Champions, Tech Lead, Engineering Manager  
+**Your Role**: AI Training Consultant guiding the workshop
+""")
+
+if 'workshop_phase' not in st.session_state:
+    st.session_state.workshop_phase = "assessment_review"
+
+workshop_tabs = st.tabs([
+    "1. Assessment Review (15 min)",
+    "2. Champion Identification (20 min)",
+    "3. Zoning Mapping (15 min)",
+    "4. Project Plan Generation"
+])
+
+with workshop_tabs[0]:
+    st.markdown("""
+    ### Current State Validation
+
+    **Facilitator Script**: *"Your assessment shows M2 maturity with 68 entropy. This is typical for teams with AI tools but no governance. Let's validate this matches your experience."*
+
+    **Discussion Points**:
+    """)
+
+    col1, col2 = st.columns(2)
+    with col1:
+        pain_point_1 = st.checkbox("Production incident from AI-generated code in last 3 months")
+        pain_point_2 = st.checkbox("Champions spending >50% time on review/gatekeeping")
+        pain_point_3 = st.checkbox("Novice developers avoiding AI tools due to fear")
+
+    with col2:
+        pain_point_4 = st.checkbox("No documented standards for AI-generated code")
+        pain_point_5 = st.checkbox("Rework rate perceived as 'high' by team")
+
+    st.text_area("Key Incidents to Address",
+                 placeholder="Describe recent production issues or near-misses related to AI code...",
+                 key="workshop_incidents")
+
+    if pain_point_1 or pain_point_2 or pain_point_3:
+        st.info("**Workshop Focus**: Governance structure and champion protection priority")
+
+with workshop_tabs[1]:
+    st.markdown("""
+    ### Champion Mapping
+
+    **Facilitator Script**: *"Champions are not managers—they're the experts everyone already goes to. We're formalizing their authority and protecting their time. Identify 3-5 champions across critical domains."*
+    """)
+
+    champion_data = []
+
+    for i in range(1, 4):
+        with st.expander(f"Champion {i}", expanded=(i == 1)):
+            c_name = st.text_input("Name", key=f"c_name_{i}")
+            c_role = st.text_input("Current Role", key=f"c_role_{i}")
+            c_domain = st.selectbox("Domain Expertise",
+                                   ["Database/Schema", "Security/Auth", "Payment Processing",
+                                    "API/Integration", "DevOps/Infrastructure", "Frontend/UX",
+                                    "Compliance/Audit"], key=f"c_domain_{i}")
+            c_pain = st.text_area("Current Pain Point",
+                                 placeholder="E.g., 'Constant interruptions for schema questions'",
+                                 key=f"c_pain_{i}")
+            c_priority = st.selectbox("First VTCO Priority",
+                                     ["Database Schema Changes", "Security Configuration",
+                                      "API Design Patterns", "Deployment Procedures",
+                                      "Authentication Flows"], key=f"c_priority_{i}")
+
+            if c_name:
+                champion_data.append({
+                    "name": c_name,
+                    "role": c_role,
+                    "domain": c_domain,
+                    "pain": c_pain,
+                    "first_vtco": c_priority
+                })
+
+    st.session_state.champion_data = champion_data
+
+with workshop_tabs[2]:
+    st.markdown("""
+    ### Zoning Workshop
+
+    **Facilitator Script**: *"Map your codebase to Red/Yellow/Green zones. Red = Champion-only (irreversible). Yellow = Validation required. Green = Autonomous execution."*
+    """)
+
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+        st.markdown("**Red Zone**")
+        st.caption("Champion-only. Irreversible decisions.")
+        red_zones = st.text_area("File Patterns",
+                                value="migrations/*.sql\nsrc/payment/core.py\nconfig/production.yml\nsrc/security/auth.py",
+                                height=150,
+                                key="red_zones_input")
+
+    with col2:
+        st.markdown("**Yellow Zone**")
+        st.caption("Validation required. Pattern matching.")
+        yellow_zones = st.text_area("File Patterns",
+                                   value="src/api/**/*.py\nsrc/integration/*\nsrc/services/*.py",
+                                   height=150,
+                                   key="yellow_zones_input")
+
+    with col3:
+        st.markdown("**Green Zone**")
+        st.caption("Autonomous. Reversible changes.")
+        green_zones = st.text_area("File Patterns",
+                                  value="src/utils/*\ntests/*\ndocs/*\n*.md",
+                                  height=150,
+                                  key="green_zones_input")
+
+with workshop_tabs[3]:
+    st.markdown("""
+    ### Implementation Project Plan
+
+    **Facilitator Script**: *"Based on today's workshop, here's your 8-week roadmap from M2 to M3."*
+    """)
+
+    if st.button("Generate Complete Project Plan", type="primary", key="gen_plan"):
+        if not st.session_state.get('champion_data'):
+            st.warning("Please complete Champion Identification first")
+        else:
+            start_date = datetime.now()
+            week_dates = {
+                "Week 1": (start_date + timedelta(days=7)).strftime("%Y-%m-%d"),
+                "Week 2": (start_date + timedelta(days=14)).strftime("%Y-%m-%d"),
+                "Week 4": (start_date + timedelta(days=28)).strftime("%Y-%m-%d"),
+                "Week 6": (start_date + timedelta(days=42)).strftime("%Y-%m-%d"),
+                "Week 8": (start_date + timedelta(days=56)).strftime("%Y-%m-%d")
+            }
+
+            red_zones_val = st.session_state.get("red_zones_input", "migrations/*.sql\nsrc/payment/core.py")
+            yellow_zones_val = st.session_state.get("yellow_zones_input", "src/api/**/*.py\nsrc/integration/*")
+            green_zones_val = st.session_state.get("green_zones_input", "src/utils/*\ntests/*")
+
+            project_plan = {
+                "project_metadata": {
+                    "project_name": "AI Adoption Accelerator",
+                    "engagement_type": "8-Week Consulting Engagement",
+                    "start_date": start_date.strftime("%Y-%m-%d"),
+                    "target_maturity": "M3 (Agentic with Guardrails)",
+                    "consultant_role": "AI Training Consultant",
+                    "deliverable_format": "JSON"
+                },
+                "current_state_baseline": {
+                    "maturity_level": "M2",
+                    "maturity_description": "Shallow - Tools present but governance gaps",
+                    "entropy_score": 68,
+                    "entropy_status": "Above M3 threshold (30)",
+                    "key_metrics": {
+                        "adoption_rate": "22%",
+                        "rework_rate": "34%",
+                        "champion_coverage": f"{len(st.session_state.champion_data)} identified, 0 documented",
+                        "red_zone_violations": "23/month (uncontrolled)"
+                    },
+                    "critical_gaps": [
+                        "No VTCO documentation",
+                        "No zoning enforcement",
+                        "Champions burned out (80% review time)",
+                        "High premature acceptance (41%)"
+                    ]
+                },
+                "target_state": {
+                    "maturity_level": "M3",
+                    "maturity_description": "Agentic - Strong governance, scaling phase",
+                    "entropy_score": "< 30",
+                    "timeline_weeks": 8,
+                    "success_criteria": [
+                        "Entropy reduced from 68 to < 30",
+                        "Red Zone violations < 5/month",
+                        "Champion time on innovation > 65%",
+                        "100% Red Zone coverage with VTCO docs",
+                        "Novice developers autonomous in Green Zone"
+                    ],
+                    "business_outcomes": {
+                        "velocity_improvement": "106x faster lead time (industry benchmark)",
+                        "quality_improvement": "59% reduction in rework",
+                        "champion_satisfaction": "65% time on innovation vs 20% baseline"
+                    }
+                },
+                "workshop_outputs": {
+                    "champions_identified": [
+                        {
+                            "name": c["name"],
+                            "domain": c["domain"],
+                            "first_vtco_topic": c["first_vtco"],
+                            "pain_to_solve": c["pain"]
+                        } for c in st.session_state.champion_data
+                    ],
+                    "zoning_map": {
+                        "red_zone_patterns": [p.strip() for p in red_zones_val.split('\n') if p.strip()],
+                        "yellow_zone_patterns": [p.strip() for p in yellow_zones_val.split('\n') if p.strip()],
+                        "green_zone_patterns": [p.strip() for p in green_zones_val.split('\n') if p.strip()]
+                    },
+                    "priority_vtcos": [c["first_vtco"] for c in st.session_state.champion_data]
+                },
+                "execution_timeline": {
+                    "week_1": {
+                        "theme": "Foundation",
+                        "deliverables": [
+                            "Champion VTCO drafting session (2 hours)",
+                            "Complete 3-5 VTCO documents (YAML format)",
+                            "Validate zoning map with tech leads"
+                        ],
+                        "milestone": "Tribal knowledge documented",
+                        "owner": "Consultant + Champions"
+                    },
+                    "week_2": {
+                        "theme": "Configuration",
+                        "deliverables": [
+                            "Finalize governance_rules.yaml",
+                            "Configure MCP server for Red Zone blocking",
+                            "Set up .ai-governance/ directory structure"
+                        ],
+                        "milestone": "MCP enforcing Red Zone",
+                        "owner": "Consultant + Tech Lead",
+                        "checkpoint_meeting": week_dates["Week 2"]
+                    },
+                    "week_4": {
+                        "theme": "Deployment",
+                        "deliverables": [
+                            "MCP server deployed to dev environment",
+                            "Yellow Zone pattern validation active",
+                            "Entropy logging operational"
+                        ],
+                        "milestone": "Governance active in development",
+                        "owner": "Tech Lead",
+                        "checkpoint_meeting": week_dates["Week 4"]
+                    },
+                    "week_6": {
+                        "theme": "Adoption",
+                        "deliverables": [
+                            "Team training on role-based scaffolding",
+                            "Novice mentor pairs assigned",
+                            "Skill progression tracking enabled"
+                        ],
+                        "milestone": "Team operating under new governance",
+                        "owner": "Champions + Engineering Manager",
+                        "checkpoint_meeting": week_dates["Week 6"]
+                    },
+                    "week_8": {
+                        "theme": "Validation & Exit",
+                        "deliverables": [
+                            "M3 maturity validation (entropy check)",
+                            "Handoff documentation complete",
+                            "Quarterly check-in schedule established"
+                        ],
+                        "milestone": "Consultant exit, team self-sufficient",
+                        "owner": "Champions (ongoing)",
+                        "checkpoint_meeting": week_dates["Week 8"]
+                    }
+                },
+                "immediate_action_items": [
+                    {"task": "Schedule Champion VTCO drafting session", "due": "This week", "owner": "Champions", "deliverable": "3-5 completed VTCO YAML files"},
+                    {"task": "Identify 'Code Red' files for immediate protection", "due": "Week 1", "owner": "Tech Lead", "deliverable": "List of files requiring immediate MCP blocking"},
+                    {"task": "Set up .ai-governance/ directory in repository", "due": "Week 1", "owner": "DevOps/Tech Lead", "deliverable": "Repository structure ready"},
+                    {"task": "Assign mentor pairs for Novice developers", "due": "Week 2", "owner": "Engineering Manager", "deliverable": "Mentor assignments documented"}
+                ],
+                "risk_mitigation": [
+                    {"risk": "Champions unavailable for VTCO drafting", "mitigation": "Break into 30-min sessions, use voice-to-text for speed", "trigger": "Week 1 deliverable at risk"},
+                    {"risk": "MCP blocks too aggressively (Yellow/Green overlap)", "mitigation": "Adjust file patterns, add override for emergencies", "trigger": "Developer complaints in Week 2-3"},
+                    {"risk": "Adoption drops during transition (M2 to M3 dip)", "mitigation": "Monitor entropy weekly, adjust scaffolding levels", "trigger": "Entropy increases for 2 consecutive weeks"}
+                ],
+                "deliverables_repository": {
+                    "directory_structure": [
+                        ".ai-governance/",
+                        "  tribal-knowledge/",
+                        "    payment_processing.yaml (VTCO)",
+                        "    database_schema.yaml (VTCO)",
+                        "    [champion_domain].yaml (VTCOs)",
+                        "  entropy_log.jsonl",
+                        "  violations.jsonl",
+                        "  governance_rules.yaml"
+                    ],
+                    "file_formats": {
+                        "vtcos": "YAML (Verb-Task-Constraint-Outcome)",
+                        "logs": "JSON Lines (append-only)",
+                        "rules": "YAML (zoning and scaffolding config)"
+                    }
+                }
+            }
+
+            st.success("Project Plan Generated from Workshop Data")
+
+            dl_col1, dl_col2 = st.columns(2)
+
+            with dl_col1:
+                st.download_button(
+                    label="Download Project Plan (JSON)",
+                    data=json.dumps(project_plan, indent=2),
+                    file_name=f"ai_adoption_project_plan_{start_date.strftime('%Y%m%d')}.json",
+                    mime="application/json",
+                    use_container_width=True,
+                    key="dl_plan"
+                )
+
+            with dl_col2:
+                first_vtco_topic = st.session_state.champion_data[0]["first_vtco"] if st.session_state.champion_data else "Database Schema Changes"
+                first_champion = st.session_state.champion_data[0]["name"] if st.session_state.champion_data else "Champion_Name"
+                first_domain = st.session_state.champion_data[0]["domain"] if st.session_state.champion_data else "Database/Schema"
+
+                vtco_template = f"""# VTCO: {first_vtco_topic}
+# Generated from Kickoff Workshop
+domain: "{first_domain.lower().replace('/', '_')}"
+champion_owner: "{first_champion}"
+sdlc_phase: "Design-Database"
+created_date: "{start_date.strftime('%Y-%m-%d')}"
+last_validated: "{start_date.strftime('%Y-%m-%d')}"
+
+vtco_definition:
+  verb: "Modify"
+  task: "{first_vtco_topic} in production environment"
+  constraints:
+    technical:
+      - "[Constraint from workshop discussion]"
+      - "Zero downtime requirement"
+      - "Rollback script verified before deployment"
+    compliance:
+      - "[Compliance requirement identified in workshop]"
+    performance:
+      - "Query latency p95 < 50ms post-change"
+  outcome: "Safe deployment with full audit trail and zero incidents"
+
+governance_rules:
+  zone: "Red"
+  m_level_requirement: "M4"
+  ai_behavior:
+    allowed:
+      - "Explain risks and alternatives"
+      - "Review rollback script syntax"
+      - "Suggest testing strategies"
+    forbidden:
+      - "Generate final deployment commands"
+      - "Approve changes without champion sign-off"
+      - "Bypass safety constraints"
+    on_violation: "Block and trigger ADR (Architectural Decision Record)"
+    scaffolding: "Explain architectural implications to requesting developer"
+
+escalation_path:
+  if_ai_uncertain: "Flag for {first_champion} review"
+  if_constraints_conflict: "Schedule emergency architecture review"
+  emergency_contact: "[champion_email@company.com]"
+  adr_required: true
+
+ai_reminder: "This is RED ZONE - requires {first_champion} approval. Do not proceed without champion sign-off."
+"""
+
+                st.download_button(
+                    label="Download VTCO Template (YAML)",
+                    data=vtco_template,
+                    file_name=f"vtco_{first_domain.lower().replace('/', '_').replace(' ', '_')}.yaml",
+                    mime="text/yaml",
+                    use_container_width=True,
+                    key="dl_vtco"
+                )
+
+            st.subheader("Workshop Summary Dashboard")
+
+            sum_col1, sum_col2, sum_col3 = st.columns(3)
+            with sum_col1:
+                st.metric("Champions Identified", len(st.session_state.champion_data))
+                st.metric("Red Zone Patterns", len([p for p in red_zones_val.split('\n') if p.strip()]))
+            with sum_col2:
+                st.metric("Start Date", start_date.strftime("%b %d"))
+                st.metric("Target M3 Date", week_dates["Week 8"])
+            with sum_col3:
+                st.metric("Current Entropy", "68", delta="-38 to M3")
+                st.metric("Consultant Exit", "Week 8")
+
+            champion_names = ", ".join([c["name"] for c in st.session_state.champion_data])
+            st.info(f"**Next Step**: Schedule Champion VTCO drafting session with {champion_names} for this week. Goal: Complete {len(st.session_state.champion_data)} VTCO documents.")
+
 st.divider()
 
 # THREE ACTORS IN GOVERNANCE (Demo-Ready Version)
