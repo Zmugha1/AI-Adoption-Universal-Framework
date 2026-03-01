@@ -10,17 +10,19 @@ def render_sidebar(use_nav_radio=True, nav_index=0):
     NAV_OPTIONS = [
         "1. Framework & Architecture",
         "2. Baseline Assessment (M2)",
-        "3. Scaling Ready (M3)"
+        "3. Scaling Ready (M3)",
+        "4. Implementation Playbook"
     ]
     # Section 1: Navigation
     st.sidebar.title("Navigation")
     if use_nav_radio:
-        nav = st.sidebar.radio("Go to", NAV_OPTIONS, index=min(nav_index, 2))
+        nav = st.sidebar.radio("Go to", NAV_OPTIONS, index=min(nav_index, 3))
     else:
         nav = None
         st.sidebar.page_link("app.py", label="1. Framework & Architecture", query_params={"nav": "1"})
         st.sidebar.page_link("app.py", label="2. Baseline Assessment (M2)", query_params={"nav": "2"})
         st.sidebar.page_link("app.py", label="3. Scaling Ready (M3)", query_params={"nav": "3"})
+        st.sidebar.page_link("app.py", label="4. Implementation Playbook", query_params={"nav": "4"})
 
     # Section 2: Demo
     st.sidebar.divider()
