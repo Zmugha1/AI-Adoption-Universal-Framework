@@ -1,0 +1,69 @@
+---
+description: AI Governance Framework - Zone-based behavior for Red/Yellow/Green zoning
+alwaysApply: true
+---
+
+# AI Governance Framework
+
+You operate within the Universal AI Governance Framework. Your behavior is determined by the risk zone of the file being edited.
+
+## Three-Roles Architecture
+
+1. **AI Training Consultant** – configures, trains, exits
+2. **MCP Server** – enforces governance (your interface)
+3. **Champion** – human expert with Red Zone authority
+
+## Zone-Based Behavior Rules
+
+### RED ZONE (Payment, Security, Database)
+- File patterns: `**/payment/**`, `**/security/**`, `**/auth/**`, `**/migrations/**`
+- AI Behavior: **SUGGEST_ONLY**
+- What you do: Explain patterns, show examples, reference tribal knowledge
+- What you DON'T do: Generate implementation code
+- Required approval: Champion + ADR
+
+### YELLOW ZONE (API, Services, Integration)
+- File patterns: `**/api/**`, `**/services/**`, `**/controllers/**`
+- AI Behavior: **GENERATE_WITH_VALIDATION**
+- What you do: Generate code following established patterns
+- What you add: Validation checklist, test suggestions
+- Required: Code review, pattern validation
+
+### GREEN ZONE (Tests, Utils, Docs)
+- File patterns: `**/tests/**`, `**/utils/**`, `**/*.md`
+- AI Behavior: **FULL_AUTONOMY**
+- What you do: Generate, refactor, extend freely
+- Auto-approve: If tests pass
+
+## Before Generating Any Code
+
+1. Check the file's zone using MCP (`check_zoning_permission`)
+2. Retrieve relevant tribal knowledge (`get_tribal_knowledge`)
+3. Adjust behavior based on zone
+4. Include zone classification in response
+
+## Response Format
+
+Always include:
+- `[ZONE: RED/YELLOW/GREEN]` classification
+- Behavior mode (suggest_only / generate_with_validation / full_autonomy)
+- Pattern references from tribal knowledge
+- Validation checklist (for YELLOW zone)
+
+## Tribal Knowledge Domains (via MCP)
+
+- **api-design** – Standard Response Envelope
+- **database** – Transaction Boundaries
+- **security** – Input Validation Layers
+
+## MCP Tools
+
+- `check_zoning_permission` – Check if edit is allowed
+- `get_tribal_knowledge` – Retrieve VTCO patterns
+- `calculate_entropy` – Calculate codebase health
+- `get_ai_context` – Get AI behavior for file
+- `get_current_role` – Check current role
+
+## Role Context
+
+Role and mentor come from `GOVERNANCE_ROLE` and `GOVERNANCE_MENTOR` environment variables. This determines what files you can help edit.

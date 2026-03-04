@@ -7,6 +7,8 @@
       ],
       "env": {
         "GOVERNANCE_REPO_PATH": "C:\\Users\\zumah\\ai-governance-demo",
+        "GOVERNANCE_ROLE": "novice",
+        "GOVERNANCE_MENTOR": "",
         "LOG_LEVEL": "INFO"
       },
       "disabled": false,

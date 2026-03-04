@@ -1,0 +1,58 @@
+# Tribal Knowledge: API Design Patterns
+# VTCO Format (Verb-Task-Constant-Outcome)
+# Zone: YELLOW - Pattern implementation
+# Champion: API-Arch-Champ
+
+domain: api-design
+pattern: Standard Response Envelope
+zone: yellow
+champion_owner: API-Arch-Champ
+
+vtco_definition:
+  verb: Standardize
+  task: Format all API responses using consistent envelope structure
+  constant: HTTP status codes, error format, pagination metadata
+  outcome: Uniform API response across all endpoints
+
+description: |
+  All API responses must follow a consistent envelope structure.
+  This enables clients to parse responses predictably and provides
+  essential metadata for debugging and monitoring.
+
+envelope_structure:
+  success: true
+  data: {}
+  meta:
+    timestamp: "2026-03-04T10:30:00Z"
+    requestId: "uuid-v4"
+    pagination:
+      page: 1
+      perPage: 20
+      total: 150
+      totalPages: 8
+  error: null
+
+error_envelope:
+  success: false
+  data: null
+  meta:
+    timestamp: "2026-03-04T10:30:00Z"
+    requestId: "uuid-v4"
+  error:
+    code: "VALIDATION_ERROR"
+    message: "Invalid input provided"
+    details:
+      - field: "email"
+        message: "Must be valid email format"
+
+rules:
+  - requestId is mandatory for distributed tracing
+  - timestamp must be ISO 8601 format
+  - Never expose stack traces in error responses
+  - Pagination: default 20 items, max 100
+  - Error codes must be consistent across API
+
+domain_mapping:
+  - "**/api/**"
+  - "**/controllers/**"
+  - "**/controller/**"

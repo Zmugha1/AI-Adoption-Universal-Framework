@@ -1,9 +1,13 @@
 """Baseline Assessment (M2) page - Current state shallow adoption metrics."""
+import asyncio
+import os
 import sys
 from pathlib import Path
 
 # Ensure shared module is importable when run as Streamlit page
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+_repo = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(_repo))
+os.environ.setdefault("GOVERNANCE_REPO_PATH", str(_repo))
 
 import streamlit as st
 import pandas as pd
@@ -26,6 +30,49 @@ with metric_cols[2]:
     st.metric("Entropy Index", "68/100", delta="+38 above target", delta_color="inverse")
 with metric_cols[3]:
     st.metric("Champion Coverage", "15 identified, 0 documented", delta="At Risk", delta_color="off")
+
+# ---------------------------------------------------------------------------
+# Architectural Drift Metrics (from MCP)
+# ---------------------------------------------------------------------------
+st.header("Architectural Drift Metrics", divider=True)
+st.caption("CDI, Layer Violations, Churn-Complexity, Bus Factor (from calculate_architectural_drift)")
+
+if st.button("Calculate Architectural Drift", key="calc_drift"):
+    with st.spinner("Analyzing git history..."):
+        try:
+            from mcp_server import _calculate_architectural_drift
+            drift = asyncio.run(_calculate_architectural_drift({"days": 90}))
+            st.session_state.drift_result = drift
+
+if "drift_result" in st.session_state:
+    d = st.session_state.drift_result
+    drift_cols = st.columns(4)
+    with drift_cols[0]:
+        cdi = d["metrics"]["cyclical_dependency_index"]
+        st.metric("Cyclical Dependency Index", f"{cdi.get('value', 0)}%", cdi.get("status", "N/A"))
+    with drift_cols[1]:
+        lvr = d["metrics"]["layer_violation_rate"]
+        st.metric("Layer Violation Rate", f"{lvr.get('value', 0)}%", lvr.get("status", "N/A"))
+    with drift_cols[2]:
+        churn = d["metrics"]["churn_complexity"]
+        st.metric("Churn-Complexity Risk", churn.get("max_risk_score", 0), churn.get("status", "N/A"))
+    with drift_cols[3]:
+        bf = d["metrics"]["bus_factor"]
+        st.metric("Bus Factor", bf.get("average_bus_factor", 0), bf.get("status", "N/A"))
+
+    st.metric("Overall Health Score", f"{d.get('overall_score', 0)}/100", d.get("maturity", "N/A"))
+
+    with st.expander("Thresholds Reference"):
+        st.markdown("""
+        | Metric | Healthy | Warning | Critical |
+        |--------|---------|---------|----------|
+        | CDI | < 5% | 5-15% | > 15% |
+        | LVR | < 2% | 2-5% | > 5% |
+        | Churn | < 100 | 100-500 | > 500 |
+        | Bus Factor | 3+ | 2 | 1 |
+        """)
+else:
+    st.info("Click **Calculate Architectural Drift** to analyze your codebase (uses git history).")
 
 # ---------------------------------------------------------------------------
 # Metrics Reference Guide (Educational Dropdown)

@@ -1,0 +1,42 @@
+# Tribal Knowledge: Database Transaction Boundaries
+# VTCO Format (Verb-Task-Constant-Outcome)
+# Zone: RED - Champion approval required
+# Champion: DB-Champ-01
+
+domain: database
+pattern: Transaction Boundaries
+zone: red
+champion_owner: DB-Champ-01
+
+vtco_definition:
+  verb: Enforce
+  task: Wrap all write operations in explicit transaction boundaries
+  constant: ACID properties, timeout limits (30s), deadlock retry logic
+  outcome: Data consistency across distributed operations
+
+description: |
+  All database write operations must be wrapped in explicit transactions.
+  This ensures ACID compliance and prevents data inconsistency.
+
+rules:
+  - Always use select_for_update() for row locking
+  - Keep transactions short (< 100ms target)
+  - Never call external APIs inside transactions
+  - Use on_commit hooks for post-transaction actions
+  - All schema changes require rollback plan
+
+migration_rules:
+  - Never drop columns in same release as code removal
+  - Never rename - always add + backfill + remove
+  - Large tables (>1M rows): batch updates (1000 rows/batch)
+  - Always test migration on production-sized dataset
+  - All migrations require rollback plan
+
+ai_behavior:
+  reminder: RED ZONE - Champion approval required for any changes
+
+domain_mapping:
+  - "**/migrations/**"
+  - "**/migration/**"
+  - "**/schema/**"
+  - "**/ddl/**"

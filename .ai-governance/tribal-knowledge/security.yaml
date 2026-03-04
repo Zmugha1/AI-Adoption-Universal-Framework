@@ -1,0 +1,34 @@
+# Tribal Knowledge: Security - Input Validation Layers
+# VTCO Format (Verb-Task-Constant-Outcome)
+# Zone: RED - Champion approval required
+# Champion: Sec-Champ-01
+
+domain: security
+pattern: Input Validation Layers
+zone: red
+champion_owner: Sec-Champ-01
+
+vtco_definition:
+  verb: Validate
+  task: Sanitize and validate all user inputs at system boundaries
+  constant: OWASP rules, schema validation, type safety
+  outcome: Injection attack prevention, data integrity
+
+description: |
+  All user inputs must be validated and sanitized at system boundaries.
+  Never trust client input. Use schema validation (e.g., Pydantic, Zod).
+
+rules:
+  - Validate all inputs against schema before processing
+  - Use parameterized queries - never string concatenation for SQL
+  - Hash passwords with bcrypt/argon2 - never store plaintext
+  - Never expose stack traces in error responses
+  - Apply principle of least privilege
+
+ai_behavior:
+  reminder: RED ZONE - Champion approval required for security code
+
+domain_mapping:
+  - "**/security/**"
+  - "**/auth/**"
+  - "**/authentication/**"

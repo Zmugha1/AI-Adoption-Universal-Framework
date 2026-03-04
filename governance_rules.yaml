@@ -130,6 +130,8 @@ yellow_zone_patterns:
 red_zone_patterns:
   - "**/payment/**"
   - "**/security/**"
+  - "**/auth/**"
+  - "**/migrations/**"
   - "**/config/production/**"
   - "**/core/**"
   - "**/transaction*"

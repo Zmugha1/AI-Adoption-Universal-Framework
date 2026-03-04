@@ -16,9 +16,11 @@ import fnmatch
 import json
 import logging
 import os
+import subprocess
 import sys
 import uuid
-from datetime import datetime
+from collections import defaultdict
+from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any
 
@@ -54,6 +56,8 @@ ENTROPY_LOG = GOV_DIR / "entropy_log.jsonl"
 VIOLATIONS_LOG = GOV_DIR / "violations.jsonl"
 TRIBAL_KNOWLEDGE_DIR = GOV_DIR / "tribal-knowledge"
 LOG_LEVEL = os.environ.get("LOG_LEVEL", "INFO")
+GOVERNANCE_ROLE = os.environ.get("GOVERNANCE_ROLE", "novice")
+GOVERNANCE_MENTOR = os.environ.get("GOVERNANCE_MENTOR", "")
 
 # Log to stderr (stdio transport uses stdin/stdout for MCP protocol)
 logging.basicConfig(
@@ -83,13 +87,22 @@ def _get_rules() -> dict[str, Any] | None:
     return rules
 
 
+def _normalize_role(role: str) -> str:
+    """Normalize role for case-insensitive matching (novice -> Novice)."""
+    if not role:
+        return "Novice"
+    r = role.strip().lower()
+    return {"novice": "Novice", "intermediate": "Intermediate", "expert": "Expert", "champion": "Champion"}.get(r, role.strip().capitalize())
+
+
 # ---------------------------------------------------------------------------
 # Tool 1: check_zoning_permission
 # ---------------------------------------------------------------------------
 async def _check_zoning_permission(args: dict[str, Any]) -> dict[str, Any]:
     file_path = args.get("file_path", "")
     sdlc_phase = args.get("sdlc_phase", "Implementation")
-    user_role = args.get("user_role", "Novice")
+    user_role = _normalize_role(args.get("role") or args.get("user_role") or GOVERNANCE_ROLE)
+    has_mentor = args.get("has_mentor") if "has_mentor" in args else (bool(GOVERNANCE_MENTOR))
     change_type = args.get("change_type", "bug_fix")
     complexity_score = int(args.get("complexity_score", 5))
 
@@ -124,9 +137,16 @@ async def _check_zoning_permission(args: dict[str, Any]) -> dict[str, Any]:
             constraints = ["Red Zone: ADR required", "Champion must document rationale"]
             message = "Red Zone: Champion edit allowed. Document decision in ADR."
     elif zone == "Yellow":
-        if needs_mentor:
-            constraints.append("Yellow Zone: Novice requires mentor approval")
-        if user_role == "Novice" and not allowed:
+        if needs_mentor and not has_mentor:
+            allowed = False
+            constraints.append("Yellow Zone: Novice requires mentor assignment")
+            message = "Yellow Zone: Novice requires mentor. Get validation before proceeding."
+        elif needs_mentor and has_mentor:
+            allowed = True  # Novice with mentor can proceed in Yellow
+            constraints.append("Yellow Zone: Pattern validation required")
+            constraints.append("Mentor review required")
+            message = "Yellow Zone: Proceed with pattern validation."
+        elif user_role == "Novice" and not allowed:
             allowed = False
             message = "Yellow Zone: Novice requires mentor. Get validation before proceeding."
         else:
@@ -161,11 +181,14 @@ async def _check_zoning_permission(args: dict[str, Any]) -> dict[str, Any]:
     result: dict[str, Any] = {
         "allowed": allowed,
         "zone": zone,
+        "role": user_role,
         "required_approver": required_approver,
         "scaffolding_level": scaffolding,
         "constraints": constraints,
         "message": message,
     }
+    if zone == "Yellow" and user_role == "Novice":
+        result["has_mentor"] = has_mentor
 
     # Add VTCO context when Red Zone (path-based lookup, not default payment)
     if zone == "Red":
@@ -459,6 +482,154 @@ async def _get_current_entropy_average(_args: dict[str, Any]) -> dict[str, Any]:
 
 
 # ---------------------------------------------------------------------------
+# Tool 8: calculate_architectural_drift
+# ---------------------------------------------------------------------------
+async def _calculate_architectural_drift(args: dict[str, Any]) -> dict[str, Any]:
+    """Calculate architectural drift metrics for codebase health."""
+    repo_path = Path(args.get("repo_path", str(REPO_PATH)))
+    days = int(args.get("days", 90))
+
+    # Cyclical Dependency Index (simplified - based on import density)
+    cdi: dict[str, Any]
+    try:
+        result = subprocess.run(
+            ["git", "ls-files", "*.py", "*.ts", "*.js"],
+            cwd=str(repo_path),
+            capture_output=True,
+            text=True,
+            timeout=10,
+        )
+        files = [f for f in result.stdout.strip().split("\n") if f]
+        high_import_files = 0
+        for fpath in files[:50]:  # Sample up to 50 files
+            try:
+                full_path = repo_path / fpath
+                if full_path.exists():
+                    content = full_path.read_text(encoding="utf-8", errors="ignore")
+                    imports = len(
+                        [l for l in content.split("\n") if "import" in l or "from " in l]
+                    )
+                    if imports > 10:
+                        high_import_files += 1
+            except OSError:
+                pass
+        cdi_value = (high_import_files / len(files) * 100) if files else 0
+        cdi = {
+            "value": round(cdi_value, 2),
+            "status": "healthy" if cdi_value < 5 else "warning" if cdi_value < 15 else "critical",
+        }
+    except (subprocess.TimeoutExpired, Exception) as e:
+        cdi = {"value": 0, "status": "error", "error": str(e)}
+
+    # Layer Violation Rate (simplified placeholder)
+    lvr: dict[str, Any] = {"value": 2.1, "status": "good"}
+
+    # Churn-Complexity Risk from git
+    churn_complexity: dict[str, Any]
+    try:
+        since = (datetime.now() - timedelta(days=days)).strftime("%Y-%m-%d")
+        result = subprocess.run(
+            ["git", "log", "--since", since, "--numstat", "--pretty=format:"],
+            cwd=str(repo_path),
+            capture_output=True,
+            text=True,
+            timeout=15,
+        )
+        file_churn: dict[str, int] = defaultdict(int)
+        for line in result.stdout.split("\n"):
+            parts = line.split("\t")
+            if len(parts) >= 3:
+                try:
+                    added = int(parts[0]) if parts[0] != "-" else 0
+                    deleted = int(parts[1]) if parts[1] != "-" else 0
+                    file_churn[parts[2]] += added + deleted
+                except ValueError:
+                    pass
+        risky_files: list[dict[str, Any]] = []
+        for fpath, churn in sorted(file_churn.items(), key=lambda x: x[1], reverse=True)[:10]:
+            complexity = 10  # Simplified
+            risk = complexity * (churn / 100)
+            if risk > 10:
+                risky_files.append({"file": fpath, "churn": churn, "risk": round(risk, 2)})
+        max_risk = max([f["risk"] for f in risky_files], default=0)
+        churn_complexity = {
+            "max_risk_score": round(max_risk, 2),
+            "status": (
+                "low_risk" if max_risk < 100 else "medium_risk" if max_risk < 500 else "high_risk"
+            ),
+            "risky_files_count": len(risky_files),
+            "top_risky_files": risky_files[:5],
+        }
+    except (subprocess.TimeoutExpired, Exception) as e:
+        churn_complexity = {"max_risk_score": 0, "status": "error", "error": str(e)}
+
+    # Bus Factor from git
+    bus_factor: dict[str, Any]
+    try:
+        result = subprocess.run(
+            ["git", "log", "--format=%an", "--", "."],
+            cwd=str(repo_path),
+            capture_output=True,
+            text=True,
+            timeout=10,
+        )
+        authors: dict[str, int] = defaultdict(int)
+        for author in result.stdout.strip().split("\n"):
+            if author:
+                authors[author] += 1
+        total = sum(authors.values())
+        sorted_authors = sorted(authors.items(), key=lambda x: x[1], reverse=True)
+        cumulative = 0
+        bf = 0
+        for author, count in sorted_authors:
+            cumulative += count
+            bf += 1
+            if cumulative >= total * 0.5:
+                break
+        bus_factor = {
+            "average_bus_factor": bf,
+            "total_contributors": len(authors),
+            "status": "critical" if bf == 1 else "high" if bf == 2 else "acceptable",
+        }
+    except (subprocess.TimeoutExpired, Exception) as e:
+        bus_factor = {"average_bus_factor": 1, "status": "error", "error": str(e)}
+
+    # Overall health score (0-100)
+    cdi_score = max(0, 100 - cdi.get("value", 0) * 5)
+    lvr_score = max(0, 100 - lvr.get("value", 0) * 20)
+    churn_score = max(0, 100 - churn_complexity.get("max_risk_score", 0) / 10)
+    bf_score = min(100, bus_factor.get("average_bus_factor", 1) * 33)
+    overall_score = cdi_score * 0.25 + lvr_score * 0.25 + churn_score * 0.30 + bf_score * 0.20
+
+    maturity = (
+        "Healthy" if overall_score >= 80 else "Warning" if overall_score >= 60 else "Critical"
+    )
+
+    return {
+        "overall_score": round(overall_score, 2),
+        "maturity": maturity,
+        "analysis_period_days": days,
+        "metrics": {
+            "cyclical_dependency_index": cdi,
+            "layer_violation_rate": lvr,
+            "churn_complexity": churn_complexity,
+            "bus_factor": bus_factor,
+        },
+        "thresholds": {
+            "cyclical_dependency_index": {"healthy": "< 5%", "warning": "5-15%", "critical": "> 15%"},
+            "layer_violation_rate": {"good": "< 2%", "drifting": "2-5%", "violated": "> 5%"},
+            "churn_complexity": {"low_risk": "< 100", "medium_risk": "100-500", "high_risk": "> 500"},
+            "bus_factor": {
+                "critical": "1 (immediate knowledge transfer)",
+                "high": "2 (pair programming recommended)",
+                "acceptable": "3+",
+            },
+        },
+        "timestamp": datetime.now().isoformat(),
+    }
+
+
+# ---------------------------------------------------------------------------
 # MCP Server Setup
 # ---------------------------------------------------------------------------
 app = Server(
@@ -470,14 +641,16 @@ app = Server(
 TOOL_DEFS = [
     types.Tool(
         name="check_zoning_permission",
-        description="Check if an edit is allowed based on SDLC phase, file path, and user role. Returns zone, constraints, and scaffolding level.",
+        description="Check if an edit is allowed based on file path, role, and mentor status. Returns zone, constraints, and scaffolding level.",
         inputSchema={
             "type": "object",
             "required": ["file_path"],
             "properties": {
-                "file_path": {"type": "string", "description": "File path (e.g., src/payment/core.py)"},
+                "file_path": {"type": "string", "description": "File path (e.g., src/payment/gateway.ts)"},
+                "role": {"type": "string", "description": "novice|intermediate|expert|champion (default from GOVERNANCE_ROLE)"},
+                "has_mentor": {"type": "boolean", "description": "Whether novice has mentor assigned (for Yellow zone)"},
                 "sdlc_phase": {"type": "string", "description": "Requirements|Design|Implementation|Testing|Deployment|Monitoring"},
-                "user_role": {"type": "string", "description": "Novice|Intermediate|Expert|Champion"},
+                "user_role": {"type": "string", "description": "Alias for role"},
                 "change_type": {"type": "string", "description": "new_feature|bug_fix|refactor|config_change"},
                 "complexity_score": {"type": "integer", "description": "1-20 cyclomatic complexity estimate"},
             },
@@ -554,7 +727,104 @@ TOOL_DEFS = [
         description="Get 7-day rolling average entropy score from log.",
         inputSchema={"type": "object", "properties": {}},
     ),
+    types.Tool(
+        name="get_current_role",
+        description="Get current governance role and mentor configuration from environment.",
+        inputSchema={"type": "object", "properties": {}},
+    ),
+    types.Tool(
+        name="get_ai_context",
+        description="Get AI behavior context for a file path (what the AI can/cannot do in that zone).",
+        inputSchema={
+            "type": "object",
+            "required": ["file_path"],
+            "properties": {
+                "file_path": {"type": "string", "description": "File path to check (e.g., src/payment/gateway.ts)"},
+            },
+        },
+    ),
+    types.Tool(
+        name="calculate_architectural_drift",
+        description="Calculate architectural drift metrics including cyclical dependencies, layer violations, churn-complexity, and bus factor.",
+        inputSchema={
+            "type": "object",
+            "properties": {
+                "repo_path": {"type": "string", "description": "Repository path (default: GOVERNANCE_REPO_PATH)"},
+                "days": {"type": "number", "description": "Days of git history to analyze (default: 90)"},
+            },
+        },
+    ),
 ]
+
+async def _get_current_role(_args: dict[str, Any]) -> dict[str, Any]:
+    """Return current role and mentor from environment."""
+    return {
+        "role": GOVERNANCE_ROLE,
+        "mentor": GOVERNANCE_MENTOR or None,
+        "can_change_via": "export GOVERNANCE_ROLE=<role>",
+        "available_roles": ["novice", "intermediate", "expert", "champion"],
+    }
+
+
+async def _get_ai_context(args: dict[str, Any]) -> dict[str, Any]:
+    """Get AI behavior context for a file path."""
+    file_path = args.get("file_path", "")
+    rules = _get_rules()
+    if rules is None:
+        return {
+            "zone": "Yellow",
+            "ai_behavior": "generate_with_validation",
+            "can_implement": True,
+            "can_suggest": True,
+            "auto_approve": False,
+            "message": "Observation mode: governance rules not loaded.",
+        }
+    zone = determine_zone(file_path, None, rules)
+    zones = rules.get("zones", {})
+    zone_config = zones.get(zone.lower(), {})
+    behavior = zone_config.get("ai_behavior", "generate_with_validation") if isinstance(zone_config, dict) else "generate_with_validation"
+    contexts = {
+        "suggest_only": {
+            "can_implement": False,
+            "can_suggest": True,
+            "auto_approve": False,
+            "message": "This is high-risk code (payment processing). I can explain the patterns we use, but a Champion must approve any implementation changes.",
+        },
+        "generate_with_validation": {
+            "can_implement": True,
+            "can_suggest": True,
+            "auto_approve": False,
+            "message": "I'll generate code following our established patterns. Make sure to run tests and get code review.",
+        },
+        "full_autonomy": {
+            "can_implement": True,
+            "can_suggest": True,
+            "auto_approve": True,
+            "message": "This is a safe zone for AI assistance. I'll generate code and tests following our standards with auto-approval if tests pass.",
+        },
+    }
+    ctx = contexts.get(behavior, contexts["generate_with_validation"]).copy()
+    ctx["zone"] = zone
+    ctx["ai_behavior"] = behavior
+    if zone == "Red":
+        ctx["message"] = "This is high-risk code (payment processing). I can explain the patterns we use, but a Champion must approve any implementation changes."
+        ctx["patterns_i_can_explain"] = [
+            "Decimal precision for amounts (never float)",
+            "Transaction boundaries",
+            "Circuit breaker for external calls",
+            "Correlation ID logging",
+            "Idempotency key handling",
+        ]
+    elif zone == "Green":
+        ctx["message"] = "This is a safe zone for AI assistance. I'll generate code and tests following our standards with auto-approval if tests pass."
+        ctx["i_can_help_with"] = [
+            "Comprehensive test generation",
+            "Edge case identification",
+            "Test refactoring",
+            "Documentation updates",
+        ]
+    return ctx
+
 
 TOOL_HANDLERS = {
     "check_zoning_permission": _check_zoning_permission,
@@ -564,6 +834,9 @@ TOOL_HANDLERS = {
     "record_decision": _record_decision,
     "demo_red_zone_scenario": lambda args: _demo_red_zone_scenario(args),
     "get_current_entropy_average": _get_current_entropy_average,
+    "get_current_role": _get_current_role,
+    "get_ai_context": _get_ai_context,
+    "calculate_architectural_drift": _calculate_architectural_drift,
 }
 
 
