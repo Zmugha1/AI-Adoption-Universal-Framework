@@ -43,6 +43,8 @@ if st.button("Calculate Architectural Drift", key="calc_drift"):
             from mcp_server import _calculate_architectural_drift
             drift = asyncio.run(_calculate_architectural_drift({"days": 90}))
             st.session_state.drift_result = drift
+        except Exception as e:
+            st.error(f"Could not calculate drift: {e}")
 
 if "drift_result" in st.session_state:
     d = st.session_state.drift_result
