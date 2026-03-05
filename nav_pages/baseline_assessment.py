@@ -1,5 +1,4 @@
 """Baseline Assessment (M2) page - Current state shallow adoption metrics."""
-import asyncio
 import os
 import sys
 from pathlib import Path
@@ -40,8 +39,8 @@ st.caption("CDI, Layer Violations, Churn-Complexity, Bus Factor (from calculate_
 if st.button("Calculate Architectural Drift", key="calc_drift"):
     with st.spinner("Analyzing git history..."):
         try:
-            from mcp_server import _calculate_architectural_drift
-            drift = asyncio.run(_calculate_architectural_drift({"days": 90}))
+            from architectural_drift import calculate_architectural_drift
+            drift = calculate_architectural_drift(repo_path=str(_repo), days=90)
             st.session_state.drift_result = drift
         except Exception as e:
             st.error(f"Could not calculate drift: {e}")

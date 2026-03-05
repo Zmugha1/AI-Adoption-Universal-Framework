@@ -16,6 +16,7 @@ import fnmatch
 import json
 import logging
 import os
+import re
 import subprocess
 import sys
 import uuid
@@ -54,6 +55,8 @@ REPO_PATH = Path(os.environ.get("GOVERNANCE_REPO_PATH", "."))
 GOV_DIR = REPO_PATH / ".ai-governance"
 ENTROPY_LOG = GOV_DIR / "entropy_log.jsonl"
 VIOLATIONS_LOG = GOV_DIR / "violations.jsonl"
+COACHING_LOG = GOV_DIR / "coaching_log.jsonl"
+QUIZ_RESULTS_PATH = GOV_DIR / "quiz_results.json"
 TRIBAL_KNOWLEDGE_DIR = GOV_DIR / "tribal-knowledge"
 LOG_LEVEL = os.environ.get("LOG_LEVEL", "INFO")
 GOVERNANCE_ROLE = os.environ.get("GOVERNANCE_ROLE", "novice")
@@ -95,6 +98,177 @@ def _normalize_role(role: str) -> str:
     return {"novice": "Novice", "intermediate": "Intermediate", "expert": "Expert", "champion": "Champion"}.get(r, role.strip().capitalize())
 
 
+def _quiz_passed() -> bool:
+    """Check if novice has passed the governance quiz (unlocks YELLOW zone)."""
+    if not QUIZ_RESULTS_PATH.exists():
+        return False
+    try:
+        with open(QUIZ_RESULTS_PATH, encoding="utf-8") as f:
+            data = json.load(f)
+        return data.get("v1", {}).get("passed", False)
+    except (json.JSONDecodeError, OSError):
+        return False
+
+
+# ---------------------------------------------------------------------------
+# COACHING INTERACTION LOGGING
+# ---------------------------------------------------------------------------
+_coaching_session_id: str | None = None
+
+
+def get_session_id() -> str:
+    """Generate unique session ID for tracking interactions."""
+    global _coaching_session_id
+    if _coaching_session_id is None:
+        _coaching_session_id = str(uuid.uuid4())[:8]
+    return _coaching_session_id
+
+
+def anonymize_sensitive_data(text: str) -> str:
+    """Remove sensitive data from text before logging."""
+    if not text:
+        return ""
+    anonymized = text
+    patterns = [
+        (r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b", "[EMAIL]"),
+        (r"\b(password|secret|key|token|api_key)\s*[=:]\s*\S+", "[REDACTED]"),
+        (r"\b\d{16}\b", "[CARD_MASKED]"),  # Card numbers
+    ]
+    for pattern, replacement in patterns:
+        anonymized = re.sub(pattern, replacement, anonymized, flags=re.IGNORECASE)
+    return anonymized
+
+
+def _get_zone_for_path(file_path: str) -> str:
+    """Get zone for file path (for logging)."""
+    rules = _get_rules()
+    if not rules:
+        return "unknown"
+    return determine_zone(file_path, None, rules)
+
+
+def _get_zone_ai_behavior(zone: str) -> str:
+    """Get AI behavior mode for zone."""
+    behaviors = {"Red": "suggest_only", "Yellow": "generate_with_validation", "Green": "full_autonomy"}
+    return behaviors.get(zone, "unknown")
+
+
+def _infer_intent(query: str) -> str:
+    """Infer developer intent from query."""
+    if not query:
+        return "general_inquiry"
+    q = query.lower()
+    if any(kw in q for kw in ["generate", "create", "write", "implement"]):
+        return "code_generation"
+    if any(kw in q for kw in ["explain", "how does", "what is", "why"]):
+        return "explanation"
+    if any(kw in q for kw in ["fix", "error", "bug", "not working"]):
+        return "debugging"
+    if any(kw in q for kw in ["refactor", "improve", "clean up", "optimize"]):
+        return "refactoring"
+    if any(kw in q for kw in ["pattern", "standard", "how should", "best practice"]):
+        return "pattern_request"
+    return "general_inquiry"
+
+
+def log_coaching_interaction(event_type: str, data: dict[str, Any]) -> None:
+    """
+    Log every coaching interaction for analysis and improvement.
+
+    Event types: coaching_request, coaching_provided, coaching_accepted,
+    coaching_modified, coaching_rejected, pattern_referenced, skill_progression
+    """
+    _ensure_gov_dir()
+    log_entry = {
+        "timestamp": datetime.utcnow().isoformat() + "Z",
+        "event_type": event_type,
+        "session_id": get_session_id(),
+        "governance_context": {
+            "role": GOVERNANCE_ROLE,
+            "mentor": GOVERNANCE_MENTOR or None,
+            "repo_path": str(REPO_PATH),
+        },
+        "data": data,
+    }
+    try:
+        with open(COACHING_LOG, "a", encoding="utf-8") as f:
+            f.write(json.dumps(log_entry, default=str) + "\n")
+    except OSError as e:
+        logger.error("Failed to write coaching log: %s", e)
+
+
+def _log_coaching_request(file_path: str, role: str, query: str | None = None, **extra: Any) -> None:
+    """Log when a coaching request is received."""
+    zone = _get_zone_for_path(file_path) if file_path else "unknown"
+    log_coaching_interaction("coaching_request", {
+        "file_path": file_path or None,
+        "zone": zone,
+        "developer_role": role,
+        "query": anonymize_sensitive_data(query) if query else None,
+        "intent": _infer_intent(query) if query else None,
+        **extra,
+    })
+
+
+def _log_pattern_referenced(domain: str, pattern_name: str, zone: str) -> None:
+    """Log when tribal knowledge is accessed."""
+    log_coaching_interaction("pattern_referenced", {
+        "domain": domain,
+        "pattern": pattern_name,
+        "pattern_zone": zone,
+        "developer_role": GOVERNANCE_ROLE,
+    })
+
+
+def log_coaching_provided(
+    file_path: str,
+    coaching_type: str,
+    patterns_referenced: list[str],
+    code_generated: bool,
+    lines_generated: int = 0,
+    validation_checklist: bool = False,
+    **extra: Any,
+) -> None:
+    """Log when coaching is provided."""
+    zone = _get_zone_for_path(file_path) if file_path else "unknown"
+    log_coaching_interaction("coaching_provided", {
+        "file_path": file_path or None,
+        "zone": zone,
+        "coaching_type": coaching_type,
+        "patterns_referenced": patterns_referenced,
+        "code_generated": code_generated,
+        "lines_generated": lines_generated,
+        "validation_checklist_included": validation_checklist,
+        "ai_behavior": _get_zone_ai_behavior(zone),
+        **extra,
+    })
+
+
+def log_coaching_outcome(
+    file_path: str,
+    outcome: str,
+    acceptance_rate: float | None = None,
+    lines_accepted: int | None = None,
+    lines_modified: int | None = None,
+    time_to_decision_seconds: int | None = None,
+    mentor_consulted: bool = False,
+    **extra: Any,
+) -> None:
+    """Log outcome: accepted, modified, or rejected."""
+    zone = _get_zone_for_path(file_path) if file_path else "unknown"
+    log_coaching_interaction(f"coaching_{outcome}", {
+        "file_path": file_path or None,
+        "zone": zone,
+        "outcome": outcome,
+        "acceptance_rate": acceptance_rate,
+        "lines_accepted": lines_accepted,
+        "lines_modified": lines_modified,
+        "time_to_decision_seconds": time_to_decision_seconds,
+        "mentor_consulted": mentor_consulted,
+        **extra,
+    })
+
+
 # ---------------------------------------------------------------------------
 # Tool 1: check_zoning_permission
 # ---------------------------------------------------------------------------
@@ -102,9 +276,18 @@ async def _check_zoning_permission(args: dict[str, Any]) -> dict[str, Any]:
     file_path = args.get("file_path", "")
     sdlc_phase = args.get("sdlc_phase", "Implementation")
     user_role = _normalize_role(args.get("role") or args.get("user_role") or GOVERNANCE_ROLE)
-    has_mentor = args.get("has_mentor") if "has_mentor" in args else (bool(GOVERNANCE_MENTOR))
+    has_mentor = args.get("has_mentor") if "has_mentor" in args else (bool(GOVERNANCE_MENTOR) or _quiz_passed())
     change_type = args.get("change_type", "bug_fix")
     complexity_score = int(args.get("complexity_score", 5))
+
+    # Log coaching request (developer asking about file/zone)
+    _log_coaching_request(
+        file_path,
+        user_role,
+        query=args.get("query"),
+        has_mentor=has_mentor,
+        change_type=change_type,
+    )
 
     rules = _get_rules()
     if rules is None:
@@ -132,15 +315,15 @@ async def _check_zoning_permission(args: dict[str, Any]) -> dict[str, Any]:
             allowed = False
             required_approver = "champion_id"
             constraints = ["Red Zone: Champion approval required", "AI behavior: suggest_only"]
-            message = "Red Zone: Only Champions may edit. Use suggest-only mode and escalate to Champion."
+            message = "Access Denied - GREEN zone only. Red zone requires Champion. (Pass quiz to unlock YELLOW: POST http://localhost:3001/quiz/submit)"
         else:
             constraints = ["Red Zone: ADR required", "Champion must document rationale"]
             message = "Red Zone: Champion edit allowed. Document decision in ADR."
     elif zone == "Yellow":
         if needs_mentor and not has_mentor:
             allowed = False
-            constraints.append("Yellow Zone: Novice requires mentor assignment")
-            message = "Yellow Zone: Novice requires mentor. Get validation before proceeding."
+            constraints.append("Yellow Zone: Novice requires mentor or quiz pass")
+            message = "Access Denied - GREEN zone only. Pass the governance quiz to unlock YELLOW zone: POST http://localhost:3001/quiz/submit"
         elif needs_mentor and has_mentor:
             allowed = True  # Novice with mentor can proceed in Yellow
             constraints.append("Yellow Zone: Pattern validation required")
@@ -282,6 +465,11 @@ async def _get_tribal_knowledge(args: dict[str, Any]) -> dict[str, Any]:
             "champion_owner": "",
             "message": f"No VTCO found for domain '{domain}'. Champion should add .ai-governance/tribal-knowledge/{domain}.yaml",
         }
+
+    # Log pattern/tribal knowledge access
+    pattern_name = vtco.get("pattern", vtco.get("domain", domain))
+    zone = vtco.get("zone", "unknown")
+    _log_pattern_referenced(domain, str(pattern_name), str(zone))
 
     ai_behavior = vtco.get("ai_behavior", {})
     if isinstance(ai_behavior, dict):
@@ -486,146 +674,129 @@ async def _get_current_entropy_average(_args: dict[str, Any]) -> dict[str, Any]:
 # ---------------------------------------------------------------------------
 async def _calculate_architectural_drift(args: dict[str, Any]) -> dict[str, Any]:
     """Calculate architectural drift metrics for codebase health."""
-    repo_path = Path(args.get("repo_path", str(REPO_PATH)))
+    from architectural_drift import calculate_architectural_drift
+    repo_path = args.get("repo_path", str(REPO_PATH))
     days = int(args.get("days", 90))
+    return calculate_architectural_drift(repo_path=repo_path, days=days)
 
-    # Cyclical Dependency Index (simplified - based on import density)
-    cdi: dict[str, Any]
+
+# ---------------------------------------------------------------------------
+# Tool: get_coaching_analytics
+# ---------------------------------------------------------------------------
+def _load_coaching_entries() -> list[dict[str, Any]]:
+    """Load coaching log entries."""
+    if not COACHING_LOG.exists():
+        return []
+    entries = []
     try:
-        result = subprocess.run(
-            ["git", "ls-files", "*.py", "*.ts", "*.js"],
-            cwd=str(repo_path),
-            capture_output=True,
-            text=True,
-            timeout=10,
-        )
-        files = [f for f in result.stdout.strip().split("\n") if f]
-        high_import_files = 0
-        for fpath in files[:50]:  # Sample up to 50 files
-            try:
-                full_path = repo_path / fpath
-                if full_path.exists():
-                    content = full_path.read_text(encoding="utf-8", errors="ignore")
-                    imports = len(
-                        [l for l in content.split("\n") if "import" in l or "from " in l]
-                    )
-                    if imports > 10:
-                        high_import_files += 1
-            except OSError:
-                pass
-        cdi_value = (high_import_files / len(files) * 100) if files else 0
-        cdi = {
-            "value": round(cdi_value, 2),
-            "status": "healthy" if cdi_value < 5 else "warning" if cdi_value < 15 else "critical",
-        }
-    except (subprocess.TimeoutExpired, Exception) as e:
-        cdi = {"value": 0, "status": "error", "error": str(e)}
-
-    # Layer Violation Rate (simplified placeholder)
-    lvr: dict[str, Any] = {"value": 2.1, "status": "good"}
-
-    # Churn-Complexity Risk from git
-    churn_complexity: dict[str, Any]
-    try:
-        since = (datetime.now() - timedelta(days=days)).strftime("%Y-%m-%d")
-        result = subprocess.run(
-            ["git", "log", "--since", since, "--numstat", "--pretty=format:"],
-            cwd=str(repo_path),
-            capture_output=True,
-            text=True,
-            timeout=15,
-        )
-        file_churn: dict[str, int] = defaultdict(int)
-        for line in result.stdout.split("\n"):
-            parts = line.split("\t")
-            if len(parts) >= 3:
+        with open(COACHING_LOG, encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if not line:
+                    continue
                 try:
-                    added = int(parts[0]) if parts[0] != "-" else 0
-                    deleted = int(parts[1]) if parts[1] != "-" else 0
-                    file_churn[parts[2]] += added + deleted
-                except ValueError:
-                    pass
-        risky_files: list[dict[str, Any]] = []
-        for fpath, churn in sorted(file_churn.items(), key=lambda x: x[1], reverse=True)[:10]:
-            complexity = 10  # Simplified
-            risk = complexity * (churn / 100)
-            if risk > 10:
-                risky_files.append({"file": fpath, "churn": churn, "risk": round(risk, 2)})
-        max_risk = max([f["risk"] for f in risky_files], default=0)
-        churn_complexity = {
-            "max_risk_score": round(max_risk, 2),
-            "status": (
-                "low_risk" if max_risk < 100 else "medium_risk" if max_risk < 500 else "high_risk"
-            ),
-            "risky_files_count": len(risky_files),
-            "top_risky_files": risky_files[:5],
-        }
-    except (subprocess.TimeoutExpired, Exception) as e:
-        churn_complexity = {"max_risk_score": 0, "status": "error", "error": str(e)}
+                    entries.append(json.loads(line))
+                except json.JSONDecodeError:
+                    continue
+    except OSError:
+        pass
+    return entries
 
-    # Bus Factor from git
-    bus_factor: dict[str, Any]
-    try:
-        result = subprocess.run(
-            ["git", "log", "--format=%an", "--", "."],
-            cwd=str(repo_path),
-            capture_output=True,
-            text=True,
-            timeout=10,
-        )
-        authors: dict[str, int] = defaultdict(int)
-        for author in result.stdout.strip().split("\n"):
-            if author:
-                authors[author] += 1
-        total = sum(authors.values())
-        sorted_authors = sorted(authors.items(), key=lambda x: x[1], reverse=True)
-        cumulative = 0
-        bf = 0
-        for author, count in sorted_authors:
-            cumulative += count
-            bf += 1
-            if cumulative >= total * 0.5:
-                break
-        bus_factor = {
-            "average_bus_factor": bf,
-            "total_contributors": len(authors),
-            "status": "critical" if bf == 1 else "high" if bf == 2 else "acceptable",
-        }
-    except (subprocess.TimeoutExpired, Exception) as e:
-        bus_factor = {"average_bus_factor": 1, "status": "error", "error": str(e)}
 
-    # Overall health score (0-100)
-    cdi_score = max(0, 100 - cdi.get("value", 0) * 5)
-    lvr_score = max(0, 100 - lvr.get("value", 0) * 20)
-    churn_score = max(0, 100 - churn_complexity.get("max_risk_score", 0) / 10)
-    bf_score = min(100, bus_factor.get("average_bus_factor", 1) * 33)
-    overall_score = cdi_score * 0.25 + lvr_score * 0.25 + churn_score * 0.30 + bf_score * 0.20
+def _compute_coaching_metrics(entries: list[dict[str, Any]]) -> dict[str, Any]:
+    """Compute coaching metrics from log entries."""
+    metrics: dict[str, Any] = {
+        "total_events": len(entries),
+        "by_event_type": {},
+        "by_role": {},
+        "by_zone": {},
+        "outcomes": {"accepted": 0, "modified": 0, "rejected": 0},
+        "patterns_accessed": {},
+        "unique_sessions": 0,
+        "mentor_involvement": 0,
+        "code_generated_count": 0,
+        "total_lines_generated": 0,
+    }
+    by_event: dict[str, int] = defaultdict(int)
+    by_role: dict[str, int] = defaultdict(int)
+    by_zone: dict[str, int] = defaultdict(int)
+    patterns: dict[str, int] = defaultdict(int)
+    sessions: set[str] = set()
 
-    maturity = (
-        "Healthy" if overall_score >= 80 else "Warning" if overall_score >= 60 else "Critical"
+    for e in entries:
+        event = e.get("event_type", "")
+        data = e.get("data", {})
+        ctx = e.get("governance_context", {})
+
+        by_event[event] += 1
+        sessions.add(e.get("session_id", ""))
+
+        role = data.get("developer_role") or ctx.get("role", "unknown")
+        zone = data.get("zone", "unknown")
+        if role:
+            by_role[str(role).lower()] += 1
+        if zone:
+            by_zone[str(zone)] += 1
+
+        if event == "coaching_accepted":
+            metrics["outcomes"]["accepted"] += 1
+            if data.get("mentor_consulted"):
+                metrics["mentor_involvement"] += 1
+        elif event == "coaching_modified":
+            metrics["outcomes"]["modified"] += 1
+        elif event == "coaching_rejected":
+            metrics["outcomes"]["rejected"] += 1
+
+        if event == "pattern_referenced":
+            domain = data.get("domain", "unknown")
+            patterns[domain] += 1
+
+        if event == "coaching_provided":
+            if data.get("code_generated"):
+                metrics["code_generated_count"] += 1
+            metrics["total_lines_generated"] += data.get("lines_generated", 0)
+
+    metrics["by_event_type"] = dict(by_event)
+    metrics["by_role"] = dict(by_role)
+    metrics["by_zone"] = dict(by_zone)
+    metrics["patterns_accessed"] = dict(patterns)
+    metrics["unique_sessions"] = len(sessions)
+
+    total_outcomes = sum(metrics["outcomes"].values())
+    metrics["acceptance_rate"] = (
+        round(metrics["outcomes"]["accepted"] / total_outcomes * 100, 1) if total_outcomes > 0 else None
     )
 
+    return metrics
+
+
+def _compute_tuning_insights(metrics: dict[str, Any]) -> list[str]:
+    """Generate tuning insights from metrics."""
+    insights = []
+    total_outcomes = sum(metrics["outcomes"].values())
+    if total_outcomes > 0:
+        accepted = metrics["outcomes"]["accepted"]
+        rejected = metrics["outcomes"]["rejected"]
+        acceptance_rate = accepted / total_outcomes * 100
+        insights.append(f"Acceptance rate: {acceptance_rate:.1f}% ({accepted}/{total_outcomes})")
+        if rejected > accepted and total_outcomes >= 3:
+            insights.append("High rejection rate - consider reducing verbosity or improving pattern relevance")
+    if metrics["patterns_accessed"]:
+        top = max(metrics["patterns_accessed"].items(), key=lambda x: x[1])
+        insights.append(f"Most used pattern: {top[0]} ({top[1]}x)")
+    return insights
+
+
+async def _get_coaching_analytics(_args: dict[str, Any]) -> dict[str, Any]:
+    """Get coaching interaction analytics and tuning insights."""
+    entries = _load_coaching_entries()
+    metrics = _compute_coaching_metrics(entries)
+    insights = _compute_tuning_insights(metrics)
     return {
-        "overall_score": round(overall_score, 2),
-        "maturity": maturity,
-        "analysis_period_days": days,
-        "metrics": {
-            "cyclical_dependency_index": cdi,
-            "layer_violation_rate": lvr,
-            "churn_complexity": churn_complexity,
-            "bus_factor": bus_factor,
-        },
-        "thresholds": {
-            "cyclical_dependency_index": {"healthy": "< 5%", "warning": "5-15%", "critical": "> 15%"},
-            "layer_violation_rate": {"good": "< 2%", "drifting": "2-5%", "violated": "> 5%"},
-            "churn_complexity": {"low_risk": "< 100", "medium_risk": "100-500", "high_risk": "> 500"},
-            "bus_factor": {
-                "critical": "1 (immediate knowledge transfer)",
-                "high": "2 (pair programming recommended)",
-                "acceptable": "3+",
-            },
-        },
-        "timestamp": datetime.now().isoformat(),
+        "metrics": metrics,
+        "tuning_insights": insights,
+        "log_path": str(COACHING_LOG),
+        "entries_analyzed": len(entries),
     }
 
 
@@ -653,6 +824,7 @@ TOOL_DEFS = [
                 "user_role": {"type": "string", "description": "Alias for role"},
                 "change_type": {"type": "string", "description": "new_feature|bug_fix|refactor|config_change"},
                 "complexity_score": {"type": "integer", "description": "1-20 cyclomatic complexity estimate"},
+                "query": {"type": "string", "description": "Developer's question (anonymized in coaching log)"},
             },
         },
     ),
@@ -754,6 +926,11 @@ TOOL_DEFS = [
             },
         },
     ),
+    types.Tool(
+        name="get_coaching_analytics",
+        description="Get coaching interaction analytics: acceptance rate, patterns used, outcomes by role/zone, and tuning insights.",
+        inputSchema={"type": "object", "properties": {}},
+    ),
 ]
 
 async def _get_current_role(_args: dict[str, Any]) -> dict[str, Any]:
@@ -761,6 +938,7 @@ async def _get_current_role(_args: dict[str, Any]) -> dict[str, Any]:
     return {
         "role": GOVERNANCE_ROLE,
         "mentor": GOVERNANCE_MENTOR or None,
+        "yellow_zone_unlocked": _quiz_passed() or bool(GOVERNANCE_MENTOR),
         "can_change_via": "export GOVERNANCE_ROLE=<role>",
         "available_roles": ["novice", "intermediate", "expert", "champion"],
     }
@@ -837,6 +1015,7 @@ TOOL_HANDLERS = {
     "get_current_role": _get_current_role,
     "get_ai_context": _get_ai_context,
     "calculate_architectural_drift": _calculate_architectural_drift,
+    "get_coaching_analytics": _get_coaching_analytics,
 }
 
 
@@ -870,7 +1049,20 @@ def main() -> int:
     _ensure_gov_dir()
     rules = _get_rules()
     if rules:
-        logger.info("Governance rules loaded. Zones: %s", list(rules.get("zones", {}).keys()))
+        zones = rules.get("zones", {})
+        zone_count = len(zones)
+        patterns = (
+            len(rules.get("green_zone_patterns", []))
+            + len(rules.get("yellow_zone_patterns", []))
+            + len(rules.get("red_zone_patterns", []))
+        )
+        competency_count = len(rules.get("skill_scaffolding", {}))
+        logger.info(
+            "AI Governance MCP Server starting... Loaded %d zones, %d patterns, %d competency levels",
+            zone_count,
+            patterns,
+            competency_count,
+        )
     else:
         logger.info("Observation mode: no governance rules")
     logger.info("AI Governance MCP server ready (stdio)")

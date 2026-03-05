@@ -24,6 +24,8 @@ Thumbs.db
 # MCP / AI Governance runtime logs
 .ai-governance/entropy_log.jsonl
 .ai-governance/violations.jsonl
+.ai-governance/coaching_log.jsonl
+.ai-governance/quiz_results.json
 
 # Debug
 debug.log
