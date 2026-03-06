@@ -1,0 +1,58 @@
+# WHY: random_state - Explanation Database
+topic: random_state
+title: "Why Reproducibility is the Foundation of Science"
+
+why_it_matters: |
+  Reproducibility is the foundation of science. Without it, you can't debug,
+  compare runs, or trust your results. random_state ensures that stochastic
+  operations (splits, model initialization) produce identical results across runs.
+
+detailed_explanation: |
+  Machine learning involves randomness: train/test splits, model initialization
+  (neural nets), hyperparameter search, etc. Without fixing the seed:
+
+  1. You can't reproduce bugs - "It worked on my machine" becomes unfixable
+  2. You can't compare models fairly - Different runs = different splits
+  3. You can't validate changes - Did the improvement come from your fix or luck?
+  4. You can't collaborate - Teammates get different results from same code
+
+  Setting random_state=42 (or any fixed integer) seeds the RNG so all stochastic
+  operations are deterministic across runs.
+
+common_misconceptions:
+  - "Setting random_state makes models deterministic. True, and that's the point."
+  - "Different seeds give better models. No, just different initializations; pick one and stick with it."
+  - "Only needed for sklearn. No, needed for PyTorch, TensorFlow, train_test_split, etc."
+
+alternatives:
+  - name: "Global numpy seed"
+    pros: "One place to set"
+    cons: "Affects all code; can be overwritten; hard to scope"
+  - name: "Environment variable"
+    pros: "Configurable without code change"
+    cons: "Easy to forget; not in version control"
+  - name: "Config file (random_state=42)"
+    pros: "Centralized; version controlled; explicit"
+    cons: "Must pass through code"
+
+references:
+  - source: "Scikit-learn Documentation"
+    url: "https://scikit-learn.org/stable/glossary.html#term-random_state"
+    credibility: 5
+  - source: "Machine Learning Mastery - Reproducibility"
+    url: "https://machinelearningmastery.com/reproducible-results-neural-networks/"
+    credibility: 4
+
+validation_checklist:
+  - "random_state set in train_test_split"
+  - "random_state set in model constructor"
+  - "random_state set in cross_val_score / GridSearchCV"
+  - "numpy.random.seed if using raw numpy"
+
+wrong_code: |
+  X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+  model = LogisticRegression()
+
+correct_code: |
+  X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+  model = LogisticRegression(random_state=42)

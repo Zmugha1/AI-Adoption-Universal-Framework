@@ -1,0 +1,63 @@
+# WHY: cross_validation - Explanation Database
+topic: cross_validation
+title: "Why Single Splits Lie and CV Tells the Truth"
+
+why_it_matters: |
+  A single train/test split can be lucky or unlucky. One run might show 90%
+  accuracy; the next 75%. Cross-validation averages over multiple splits to
+  give a stable, reliable estimate of model performance.
+
+detailed_explanation: |
+  Single Split Problem:
+  - One split = one sample. High variance.
+  - You might get a "lucky" split where test set is easy
+  - Or "unlucky" where test set has rare edge cases
+  - You can't tell if your model is good or you got lucky
+
+  Cross-Validation:
+  - K-fold: Split data into K folds; train on K-1, validate on 1; rotate
+  - Each fold gets a turn as validation set
+  - Average the K scores → stable estimate
+  - StratifiedKFold preserves class distribution when imbalanced
+
+  Rule of thumb: Use at least 5-fold CV unless you have very little data.
+
+common_misconceptions:
+  - "More folds = better" - Diminishing returns; 5-10 is usually enough
+  - "CV is only for model selection" - Use for final performance estimate too
+  - "Single split is fine for big data" - Still subject to variance
+
+alternatives:
+  - name: "Single train/test split"
+    pros: "Fast; simple"
+    cons: "High variance; unreliable"
+  - name: "5-fold CV"
+    pros: "Good balance; standard"
+    cons: "5x slower than single split"
+  - name: "Repeated CV"
+
+    pros: "Even more stable"
+    cons: "Slower"
+
+references:
+  - source: "Scikit-learn Cross-Validation"
+    url: "https://scikit-learn.org/stable/modules/cross_validation.html"
+    credibility: 5
+  - source: "Cross-Validation Best Practices"
+    url: "https://machinelearningmastery.com/k-fold-cross-validation/"
+    credibility: 4
+
+validation_checklist:
+  - "Use cross_val_score or cross_validate"
+  - "Use StratifiedKFold for classification"
+  - "Report mean and std of CV scores"
+  - "Don't use CV for final model training (use full data)"
+
+wrong_code: |
+  X_train, X_test, y_train, y_test = train_test_split(X, y)
+  score = model.score(X_test, y_test)  # Single number, no variance
+
+correct_code: |
+  from sklearn.model_selection import cross_val_score
+  scores = cross_val_score(model, X, y, cv=5)
+  print(f"CV accuracy: {scores.mean():.2f} (+/- {scores.std():.2f})")

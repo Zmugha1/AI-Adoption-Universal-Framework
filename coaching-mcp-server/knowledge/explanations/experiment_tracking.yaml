@@ -1,0 +1,67 @@
+# WHY: experiment_tracking - Explanation Database
+topic: experiment_tracking
+title: "Why Your Memory is Terrible and You Need an External ML Brain"
+
+why_it_matters: |
+  After 10 experiments, you won't remember which hyperparameters led to the
+  best result. After 100, you'll have no idea. Experiment tracking (MLflow,
+  Weights & Biases, etc.) is your external memory for ML.
+
+detailed_explanation: |
+  The Problem:
+  - You try lr=0.01, get 0.85 accuracy. Try lr=0.001, get 0.87. Which was better?
+  - You forgot to log the random seed. Can't reproduce.
+  - You have 5 model files. Which one was the production candidate?
+  - Teammate asks "what did we try for the fraud model?" - You don't know.
+
+  The Solution: Experiment Tracking
+  - Log every run: params, metrics, artifacts
+  - Query: "Which run had best accuracy?"
+  - Compare: Side-by-side params and metrics
+  - Reproduce: Artifacts stored with run
+
+  MLflow is the de facto standard. W&B, Neptune, etc. are alternatives.
+
+common_misconceptions:
+  - "I'll remember" - You won't
+  - "I only need it for production" - You need it from day 1
+  - "Print statements are enough" - No. No search, no comparison, no artifacts
+
+alternatives:
+  - name: "Spreadsheet / CSV"
+    pros: "Simple"
+    cons: "No artifacts; manual; no querying"
+  - name: "MLflow"
+    pros: "Standard; local or remote; integrates with sklearn"
+    cons: "UI can be heavy"
+  - name: "Weights & Biases"
+    pros: "Great UI; collaboration"
+    cons: "Cloud (or self-host)"
+
+references:
+  - source: "MLflow Documentation"
+    url: "https://mlflow.org/docs/latest/index.html"
+    credibility: 5
+  - source: "Experiment Tracking Best Practices"
+    url: "https://mlflow.org/docs/latest/tracking.html"
+    credibility: 5
+
+validation_checklist:
+  - "Log params (hyperparameters)"
+  - "Log metrics (metrics)"
+  - "Log artifacts (model file)"
+  - "Set experiment name"
+
+wrong_code: |
+  model.fit(X_train, y_train)
+  score = model.score(X_test, y_test)
+  model.save("model.pkl")  # Which run was this?
+
+correct_code: |
+  import mlflow
+  mlflow.set_experiment("my_project")
+  with mlflow.start_run():
+      mlflow.log_param("lr", 0.01)
+      model.fit(X_train, y_train)
+      mlflow.log_metric("accuracy", model.score(X_test, y_test))
+      mlflow.log_artifact("model.pkl")

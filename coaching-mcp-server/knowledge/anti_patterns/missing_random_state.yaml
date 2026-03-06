@@ -1,0 +1,29 @@
+# Anti-Pattern: Missing random_state
+name: missing_random_state
+title: "Non-Reproducible Results"
+impact: "Cannot debug; cannot compare; cannot reproduce; collaboration blocked"
+
+wrong_code: |
+  # WRONG: No random_state
+  X_train, X_test = train_test_split(X, y)
+  model = LogisticRegression()
+  clf = RandomForestClassifier()
+
+correct_code: |
+  # CORRECT: random_state everywhere
+  X_train, X_test = train_test_split(X, y, random_state=42)
+  model = LogisticRegression(random_state=42)
+  clf = RandomForestClassifier(random_state=42)
+
+  # For GridSearchCV
+  grid = GridSearchCV(model, param_grid, cv=5, random_state=42)
+
+detection_methods:
+  - "Run twice; different results?"
+  - "Grep for train_test_split, RandomForest, etc. without random_state"
+
+prevention_checklist:
+  - "random_state in train_test_split"
+  - "random_state in model constructors"
+  - "random_state in GridSearchCV / cross_val_score"
+  - "np.random.seed() if using numpy directly"

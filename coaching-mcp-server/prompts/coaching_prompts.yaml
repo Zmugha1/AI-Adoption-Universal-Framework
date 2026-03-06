@@ -1,0 +1,78 @@
+# Coaching Prompt Library
+categories:
+  learning:
+    - id: explain_this
+      name: "Explain this to me"
+      text: "Explain [CONCEPT/CODE] to me. Start with WHY it matters, then HOW it works. Include common misconceptions and what could go wrong."
+    - id: validate_understanding
+      name: "Validate my understanding"
+      text: "I think [CONCEPT] works like [MY_UNDERSTANDING]. Is that correct? What am I missing or getting wrong?"
+    - id: show_history
+      name: "Show me the history"
+      text: "What's the history and evolution of [TECHNIQUE]? Why did the community adopt it?"
+
+  diagnostics:
+    - id: debug_issue
+      name: "Debug this issue"
+      text: "I'm seeing [SYMPTOM]. Walk me through a systematic diagnostic. What are the most likely causes and how do I rule them out?"
+    - id: root_cause
+      name: "Root cause analysis"
+      text: "My model is [UNDERPERFORMING/OVERFITTING/etc]. Help me do a root cause analysis with prioritized hypotheses."
+    - id: compare_approaches
+      name: "Compare approaches"
+      text: "I'm deciding between [APPROACH_A] and [APPROACH_B] for [TASK]. Compare tradeoffs, when to use each, and what could go wrong."
+
+  code_review:
+    - id: production_readiness
+      name: "Production readiness review"
+      text: "Review this code for production readiness. Check: reproducibility, data leakage risk, error handling, observability."
+    - id: technical_debt
+      name: "Technical debt assessment"
+      text: "What technical debt does this code have? Prioritize by risk and effort to fix."
+    - id: security_review
+      name: "Security review"
+      text: "Review this ML code for security: input validation, model extraction risk, data exposure."
+
+  research:
+    - id: find_sources
+      name: "Find authoritative sources"
+      text: "Find authoritative sources (docs, papers, best practices) for [TOPIC]. Include credibility assessment."
+    - id: validate_claim
+      name: "Validate this claim"
+      text: "I read that [CLAIM]. Is this accurate? What are the caveats?"
+    - id: survey_landscape
+      name: "Survey the landscape"
+      text: "Survey the landscape for [PROBLEM]. What are the standard approaches, tools, and tradeoffs?"
+
+  coaching:
+    - id: teach_junior
+      name: "Teach me like I'm junior"
+      text: "Explain [TOPIC] as if I'm a junior engineer. No jargon without definition. Include a simple example."
+    - id: stress_test_design
+      name: "Stress test my design"
+      text: "Stress test this design: what could go wrong? Edge cases? Failure modes? How would we detect and recover?"
+    - id: design_review
+      name: "Design review"
+      text: "Review this [SYSTEM/MODEL] design. What's good? What's missing? What would you change?"
+
+  refactoring:
+    - id: simplify
+      name: "Simplify this code"
+      text: "Simplify this code while preserving behavior. Point out unnecessary complexity."
+    - id: add_abstractions
+      name: "Add proper abstractions"
+      text: "This code is repetitive. Suggest abstractions (functions, classes) that would make it maintainable."
+    - id: make_testable
+      name: "Make it testable"
+      text: "How would I make this code testable? What to mock? What are the key test cases?"
+
+  production:
+    - id: production_checklist
+      name: "Production checklist"
+      text: "Give me a production deployment checklist for this ML system: validation, monitoring, rollback, etc."
+    - id: incident_response
+      name: "Incident response"
+      text: "If [FAILURE_MODE] happens in production, what's the incident response plan? Detection, mitigation, post-mortem."
+    - id: capacity_planing
+      name: "Capacity planning"
+      text: "How do I plan capacity for this ML service? Latency, throughput, scaling considerations."

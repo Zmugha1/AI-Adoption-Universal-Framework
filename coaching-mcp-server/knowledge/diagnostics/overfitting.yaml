@@ -1,0 +1,50 @@
+# Diagnostic: Overfitting
+symptom: overfitting
+title: "Learning Curves → Complexity Check → Regularization Sweep"
+
+possible_causes:
+  - cause: "Model too complex for data size"
+    probability: 0.4
+    description: "Too many params, not enough samples"
+  - cause: "No regularization"
+    probability: 0.3
+    description: "C too high, alpha too low, no dropout"
+  - cause: "Data leakage"
+    probability: 0.15
+    description: "Train score inflated, real performance poor"
+  - cause: "Too many features"
+    probability: 0.15
+    description: "Curse of dimensionality"
+
+diagnostic_workflow:
+  - step: 1
+    name: "Learning curves"
+    actions:
+      - "Plot train vs validation score vs training set size"
+      - "Large gap = overfitting"
+      - "Both low = underfitting"
+    tools: ["sklearn.learning_curve", "matplotlib"]
+    time_estimate: "15 min"
+  - step: 2
+    name: "Complexity check"
+    actions:
+      - "Reduce model complexity (fewer layers, smaller C)"
+      - "Compare train vs val score"
+    tools: ["sklearn"]
+    time_estimate: "20 min"
+  - step: 3
+    name: "Regularization sweep"
+    actions:
+      - "Increase regularization (C, alpha, dropout)"
+      - "Early stopping for neural nets"
+    tools: ["sklearn", "PyTorch/TF callbacks"]
+    time_estimate: "30 min"
+  - step: 4
+    name: "More data / augmentation"
+    actions:
+      - "If possible, get more data"
+      - "Data augmentation for images/text"
+    tools: ["domain-specific"]
+    time_estimate: "varies"
+
+when_to_escalate: "If validation score plateaus far below train and regularization doesn't help"

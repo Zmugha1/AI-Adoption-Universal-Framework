@@ -1,0 +1,71 @@
+# WHY: pipelines - Explanation Database
+topic: pipelines
+title: "How Data Leakage Happens and Why Pipelines Prevent It"
+
+why_it_matters: |
+  Without pipelines, it's easy to accidentally fit on test data. Data leakage
+  inflates performance by 10-30% and causes production failures when the model
+  sees real-world data that wasn't "leaked" during training.
+
+detailed_explanation: |
+  The Problem: Data Leakage
+
+  Without pipelines, you might fit preprocessing on all data before splitting:
+
+  scaler = StandardScaler()
+  X_scaled = scaler.fit_transform(X)  # Fits on ALL data
+  X_train, X_test = train_test_split(X_scaled)
+
+  The scaler "saw" test data statistics. Your model gets inflated performance
+  because it was trained on information that won't exist at inference time.
+
+  The Solution: Pipelines
+
+  Pipelines ensure each step only fits on training data. The pipeline
+  orchestrates fit/transform so that:
+  - Scaler fits on X_train only
+  - Model trains on scaled X_train
+  - At predict, pipeline transforms X_test using train-derived scaler
+
+common_misconceptions:
+  - "I only need to fit on train" - Easy to forget; Pipeline enforces it
+  - "StandardScaler doesn't leak" - It does (mean/std from full data)
+  - "Pipelines are just for sklearn" - Concept applies to any framework
+
+alternatives:
+  - name: "Manual fit/transform"
+    pros: "Full control"
+    cons: "Error-prone; easy to leak; many objects to save"
+  - name: "sklearn Pipeline"
+    pros: "Single interface; no leakage; easy serialization"
+    cons: "sklearn-specific"
+  - name: "Custom pipeline class"
+    pros: "Framework-agnostic"
+    cons: "More code; must implement correctly"
+
+references:
+  - source: "Scikit-learn Pipelines"
+    url: "https://scikit-learn.org/stable/modules/compose.html"
+    credibility: 5
+  - source: "Data Leakage in Machine Learning"
+    url: "https://machinelearningmastery.com/data-leakage-machine-learning/"
+    credibility: 4
+
+validation_checklist:
+  - "All preprocessing in Pipeline"
+  - "No fit() calls outside pipeline before split"
+  - "Pipeline saved as single artifact"
+  - "Pipeline fitted only on X_train"
+
+wrong_code: |
+  scaler = StandardScaler()
+  X_scaled = scaler.fit_transform(X)
+  X_train, X_test = train_test_split(X_scaled)
+
+correct_code: |
+  pipeline = Pipeline([
+      ('scaler', StandardScaler()),
+      ('model', LogisticRegression(random_state=42))
+  ])
+  pipeline.fit(X_train, y_train)
+  score = pipeline.score(X_test, y_test)

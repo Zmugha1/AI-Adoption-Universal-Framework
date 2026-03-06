@@ -1,0 +1,45 @@
+# Anti-Pattern: Data Leakage
+name: data_leakage
+title: "Data Leakage Patterns"
+impact: "10-30% inflated accuracy; production failure when real data differs"
+
+wrong_code: |
+  # WRONG: Scaler fits on full dataset before split
+  scaler = StandardScaler()
+  X_scaled = scaler.fit_transform(X)
+  X_train, X_test = train_test_split(X_scaled)
+
+  # WRONG: Using future information
+  df['target_lag1'] = df['target'].shift(1)  # Leaks current row's info
+  df = df.dropna()  # Now "predicting" is trivial
+
+  # WRONG: Feature from test data
+  global_mean = X['col'].mean()  # Includes test in mean
+  X_train['col'] = X_train['col'].fillna(global_mean)
+
+correct_code: |
+  # CORRECT: Pipeline fits only on train
+  pipeline = Pipeline([
+      ('scaler', StandardScaler()),
+      ('imputer', SimpleImputer(strategy='mean')),  # Mean from train only
+      ('model', LogisticRegression(random_state=42))
+  ])
+  pipeline.fit(X_train, y_train)
+  pipeline.predict(X_test)
+
+  # CORRECT: Fit imputer on train, transform both
+  imputer = SimpleImputer(strategy='mean').fit(X_train)
+  X_train_imp = imputer.transform(X_train)
+  X_test_imp = imputer.transform(X_test)
+
+detection_methods:
+  - "Performance too good to be true (>95% on hard problem)"
+  - "Train score >> validation score (suspicious gap)"
+  - "Manual code review: any fit() on full data?"
+  - "Remove features one-by-one; if one causes big drop, investigate"
+
+prevention_checklist:
+  - "All preprocessing in Pipeline"
+  - "Split first, then fit on train only"
+  - "No features derived from target (except proper lag)"
+  - "Time-based split for temporal data (no future info)"

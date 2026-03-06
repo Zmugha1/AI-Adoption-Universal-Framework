@@ -1,0 +1,62 @@
+# Diagnostic: Model Underperforming
+symptom: model_underperforming
+title: "5-Step Diagnostic from Data Quality to Error Analysis"
+
+possible_causes:
+  - cause: "Data quality issues"
+    probability: 0.3
+    description: "Missing values, wrong types, label errors"
+  - cause: "Insufficient features"
+    probability: 0.25
+    description: "Model doesn't have signal to learn"
+  - cause: "Wrong model for task"
+    probability: 0.2
+    description: "e.g. Linear model for non-linear problem"
+  - cause: "Hyperparameters not tuned"
+    probability: 0.15
+    description: "Default params may be poor"
+  - cause: "Data leakage (inflated baseline)"
+    probability: 0.1
+    description: "You're comparing to wrong baseline"
+
+diagnostic_workflow:
+  - step: 1
+    name: "Data quality check"
+    actions:
+      - "Check missing values: df.isnull().sum()"
+      - "Check dtypes and value ranges"
+      - "Sample and inspect labels for errors"
+    tools: ["pandas", "missingno"]
+    time_estimate: "15-30 min"
+  - step: 2
+    name: "Baseline sanity check"
+    actions:
+      - "DummyClassifier (stratified) - what's random baseline?"
+      - "Simple model (logistic regression) - is there signal?"
+    tools: ["sklearn.DummyClassifier", "sklearn.linear_model"]
+    time_estimate: "10 min"
+  - step: 3
+    name: "Feature analysis"
+    actions:
+      - "Feature importance / coefficients"
+      - "Correlation with target"
+      - "Add/remove features and compare"
+    tools: ["sklearn", "SHAP"]
+    time_estimate: "30 min"
+  - step: 4
+    name: "Error analysis"
+    actions:
+      - "Where does model fail? (confusion matrix)"
+      - "Which samples are misclassified?"
+      - "Pattern in errors?"
+    tools: ["sklearn.metrics", "manual inspection"]
+    time_estimate: "30 min"
+  - step: 5
+    name: "Model/hyperparameter sweep"
+    actions:
+      - "Try different model families"
+      - "GridSearchCV or Optuna"
+    tools: ["sklearn", "optuna"]
+    time_estimate: "1-2 hours"
+
+when_to_escalate: "If baseline (DummyClassifier) beats your model, or data quality is severely compromised"
