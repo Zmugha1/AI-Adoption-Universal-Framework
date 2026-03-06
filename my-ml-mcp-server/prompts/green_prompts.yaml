@@ -1,0 +1,53 @@
+# GREEN Zone - Experimentation Prompts
+# Use for exploration, debugging, quick prototypes
+
+prompts:
+  - id: explore_dataset
+    name: "Explore Dataset"
+    text: |
+      Help me explore this dataset. Show me:
+      1. Shape, dtypes, and missing values
+      2. Basic statistics and distributions for key columns
+      3. Any obvious data quality issues
+      4. 2-3 visualizations that reveal interesting patterns
+      Keep it exploratory - no modeling yet.
+    tags: [exploration, eda, data]
+
+  - id: try_multiple_approaches
+    name: "Try Multiple Approaches"
+    text: |
+      I want to try 2-3 different approaches for [TASK].
+      For each approach:
+      - Brief rationale
+      - Minimal working code
+      - Quick comparison of results
+      This is experimentation - favor speed over polish.
+    tags: [experimentation, comparison]
+
+  - id: debug_understand
+    name: "Debug & Understand"
+    text: |
+      I'm seeing [BEHAVIOR/ERROR] when I run this code.
+      Help me:
+      1. Understand what's happening
+      2. Add minimal debug prints or assertions
+      3. Suggest the most likely cause
+      No need for production-ready fixes yet.
+    tags: [debug, understand]
+
+  - id: feature_ideas
+    name: "Feature Ideas"
+    text: |
+      Given this dataset and target [TARGET], suggest 5-10 feature ideas.
+      For each: name, rationale, and a one-liner to compute it.
+      I'll pick a few to prototype - no need to implement all.
+    tags: [features, ideas]
+
+  - id: quick_prototype
+    name: "Quick Prototype"
+    text: |
+      I need a quick prototype for [GOAL].
+      Prioritize: working end-to-end in <50 lines over best practices.
+      Use sensible defaults, skip config, inline everything.
+      We'll refactor later if it works.
+    tags: [prototype, quick]

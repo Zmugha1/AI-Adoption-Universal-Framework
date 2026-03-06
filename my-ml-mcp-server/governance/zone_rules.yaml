@@ -1,0 +1,52 @@
+# Personal ML MCP Server - Zone Governance Rules
+# GREEN = Experimentation | YELLOW = Development | RED = Production
+
+zones:
+  green:
+    name: "Experimentation"
+    description: "Explore freely, iterate quickly, no version control required"
+    cursor_mode: "creative"
+    rules:
+      - "Jupyter notebooks OK"
+      - "No version control required"
+      - "Explore freely"
+      - "Quick prototypes welcome"
+    file_patterns:
+      - "notebooks/**"
+      - "experiments/**"
+      - "exploration/**"
+      - "**/*.ipynb"
+      - "sandbox/**"
+
+  yellow:
+    name: "Development"
+    description: "Pattern-following, reproducible, MLflow tracking"
+    cursor_mode: "pattern_following"
+    rules:
+      - "Must use templates"
+      - "random_state=42 required"
+      - "MLflow tracking enabled"
+      - "Config externalized"
+    file_patterns:
+      - "src/**"
+      - "models/**"
+      - "pipelines/**"
+      - "features/**"
+      - "**/train*.py"
+      - "**/pipeline*.py"
+
+  red:
+    name: "Production"
+    description: "Deterministic only, full audit trail, advisory mode"
+    cursor_mode: "advisory_only"
+    rules:
+      - "Deterministic only"
+      - "Input validation mandatory"
+      - "Full audit trail"
+      - "Model cards required"
+    file_patterns:
+      - "**/production/**"
+      - "**/serve/**"
+      - "**/api/**"
+      - "**/deploy/**"
+      - "**/inference*.py"

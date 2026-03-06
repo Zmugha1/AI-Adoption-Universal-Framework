@@ -1,0 +1,58 @@
+# RED Zone - Production Prompts
+# Use for production-ready, auditable code
+
+prompts:
+  - id: production_endpoint
+    name: "Production Endpoint"
+    text: |
+      Design a production inference endpoint for [MODEL]:
+      - Input validation (schema, ranges, types)
+      - Deterministic inference (no randomness in serving path)
+      - Logging: request id, latency, model version
+      - Error handling with safe fallbacks
+      - No training code - inference only.
+    tags: [production, api, inference]
+
+  - id: explain_before_implement
+    name: "Explain Before Implementing"
+    text: |
+      Before writing code, explain:
+      1. What changes are needed
+      2. What could go wrong (failure modes)
+      3. How we'll validate it works
+      4. Rollback plan if it fails
+      I'll approve before you implement.
+    tags: [planning, safety]
+
+  - id: model_card
+    name: "Model Card"
+    text: |
+      Create a model card (Markdown) for [MODEL] covering:
+      - Intended use and limitations
+      - Training data summary
+      - Metrics and evaluation
+      - Fairness considerations (if applicable)
+      - Maintenance and retraining plan
+    tags: [model-card, documentation]
+
+  - id: ab_test_plan
+    name: "A/B Test Plan"
+    text: |
+      Plan an A/B test for deploying [MODEL] vs baseline:
+      - Success metric and minimum detectable effect
+      - Sample size / duration
+      - Guardrail metrics (latency, error rate)
+      - Rollout strategy (canary, percentage)
+      - Decision criteria for full rollout vs rollback
+    tags: [ab-test, deployment]
+
+  - id: input_validation
+    name: "Input Validation"
+    text: |
+      Add production-grade input validation for [ENDPOINT/DATA]:
+      - Schema validation (Pydantic or similar)
+      - Range checks for numerical inputs
+      - Rejection with clear error messages
+      - Log rejected inputs (sanitized) for debugging
+      - No silent failures or defaults that hide bad data
+    tags: [validation, production]

@@ -3,8 +3,22 @@
 AI Adoption Universal Framework - MCP Server
 
 Local Python-based MCP server for Cursor IDE integration.
-Implements the "Technical Enforcer" role: enforces governance rules,
-manages zoning, and tracks entropy metrics.
+Implements the "Technical Enforcer" role with full capabilities:
+
+- Zoning: Red/Yellow/Green enforcement by file path and SDLC phase; role-based
+  access (Novice/Intermediate/Expert/Champion); quiz unlock for Yellow zone.
+- Tribal knowledge: VTCO (Verb-Task-Constraint-Outcome) lookup by domain or
+  file path; domain_mapping from .ai-governance/tribal-knowledge/*.yaml.
+- Entropy tracking: bloat, rework, reverts, premature acceptance; maturity
+  levels; 7-day rolling average.
+- Coaching: interaction logging (coaching_log.jsonl); analytics and tuning
+  insights; pattern_referenced, coaching_provided, coaching_accepted/modified/rejected.
+- Code validation: security, performance, and pattern checks.
+- Architectural drift: cyclical dependencies, layer violations, churn-complexity,
+  bus factor (via architectural_drift module).
+- Decision logging: ADR and champion approvals (violations.jsonl).
+- AI context: zone-specific behavior (suggest_only, generate_with_validation,
+  full_autonomy) for any file path.
 
 Run with: python mcp_server.py
 Configure in Cursor: Add to MCP settings (mcp_config.json).

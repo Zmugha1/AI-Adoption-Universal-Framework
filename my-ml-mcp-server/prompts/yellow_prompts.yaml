@@ -1,0 +1,52 @@
+# YELLOW Zone - Development Prompts
+# Use for pattern-following, reproducible code
+
+prompts:
+  - id: train_with_pattern
+    name: "Train with Pattern"
+    text: |
+      Implement training for [MODEL/TASK] following our patterns:
+      - Use the template in patterns/train_template.py
+      - Set random_state=42 everywhere
+      - Log to MLflow: params, metrics, artifact (model path)
+      - Externalize config (learning rate, batch size) to a YAML or dataclass
+    tags: [training, mlflow, pattern]
+
+  - id: feature_pipeline
+    name: "Feature Pipeline"
+    text: |
+      Create a feature pipeline for [FEATURES]:
+      - Use sklearn Pipeline or similar
+      - Fit on train only, transform train+test
+      - Persist fitted transformer (joblib) with version in filename
+      - Add a simple test that fit+transform is deterministic given random_state
+    tags: [features, pipeline, reproducibility]
+
+  - id: validate_my_code
+    name: "Validate My Code"
+    text: |
+      Review this code against our YELLOW zone rules:
+      1. random_state=42 present?
+      2. Config externalized?
+      3. MLflow (or equivalent) tracking?
+      4. Using approved templates?
+      List any violations and suggest minimal fixes.
+    tags: [validation, compliance]
+
+  - id: externalize_config
+    name: "Externalize Config"
+    text: |
+      Extract hardcoded values from this script into a config (YAML or dataclass).
+      Include: model params, paths, random_state, feature lists.
+      Keep the script clean - config load at top, no magic numbers in logic.
+    tags: [config, refactor]
+
+  - id: add_mlflow
+    name: "Add MLflow"
+    text: |
+      Add MLflow tracking to this training script:
+      - log_params for hyperparameters
+      - log_metrics for loss/accuracy/etc
+      - log_artifact for the saved model
+      - Use experiment name from config or default "[project]_experiments"
+    tags: [mlflow, tracking]
