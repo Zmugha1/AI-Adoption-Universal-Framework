@@ -8,7 +8,20 @@ st.set_page_config(
     page_title="MLDLC DR Data Decision Intelligence",
     page_icon="📊",
     layout="wide",
+    initial_sidebar_state="expanded",
 )
+
+# Sidebar navigation
+st.sidebar.title("MLDLC Navigation")
+st.sidebar.markdown("---")
+page = st.sidebar.radio(
+    "Go to",
+    ["Dashboard", "Documentation"],
+    index=0,
+)
+
+if page == "Documentation":
+    st.switch_page("pages/6_Documentation.py")
 
 st.title("MLDLC DR Data Decision Intelligence")
 st.caption("VTCO | Risk Matrix | Schema Validation | Lineage | Audit")
@@ -32,4 +45,8 @@ When this project is open in Cursor with the MCP server configured:
 - `record_lineage` - Record transformation
 - `get_lineage` - Query lineage
 - `log_audit_event` - Log audit event
+
+## Documentation
+
+Click **Documentation** in the sidebar for the complete MLDLC guide (VTCO, Risk Matrix, Schemas, Lineage, Audit, MCP Tools, Cursor Integration, FAQ).
 """)
