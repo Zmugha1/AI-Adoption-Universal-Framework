@@ -1,0 +1,54 @@
+---
+description: "Log all governance decisions for audit compliance"
+globs: '*'
+alwaysApply: true
+---
+
+# Audit Logging Requirements
+
+## Audit Events (MUST Log)
+
+1. **VTCO Definition**
+   - When VTCO is defined
+   - All parameters
+   - Timestamp
+
+2. **Risk Assessment**
+   - Risk classification
+   - Assessment rationale
+   - Approvals obtained
+
+3. **Schema Validation**
+   - Validation results
+   - Errors found
+   - Fixes applied
+
+4. **Lineage Recording**
+   - All lineage entries
+   - Transformation details
+
+5. **Decision Making**
+   - Governance decisions
+   - Exception grants
+   - Reasoning
+
+## Audit Tool
+
+```
+Tool: mldlc-vtco/log_audit_event
+Parameters:
+  event_type: "vtco_defined" | "risk_assessed" | "schema_validated" | "lineage_recorded" | "decision_made"
+  event_data: {<event-specific data>}
+  reasoning: "Why this event occurred"
+```
+
+## Audit Resources
+
+- `audit://trail` - Full audit trail
+- `audit://events/{type}` - Events by type
+- `audit://export` - Export for compliance
+
+## Audit Prompts
+
+- `/audit-trail` - View audit trail
+- `/audit-export` - Export audit logs

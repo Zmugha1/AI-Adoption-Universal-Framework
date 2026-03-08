@@ -1,0 +1,50 @@
+---
+description: "Track data lineage for all transformations"
+globs: '**/*.py, **/*.sql'
+alwaysApply: true
+---
+
+# Data Lineage Tracking
+
+## Lineage Requirements
+
+Every data transformation MUST record:
+- Source entities (inputs)
+- Transformation logic
+- Destination entity (output)
+- Timestamp
+- Actor (who performed)
+- Context (why performed)
+
+## Lineage Tool
+
+```
+Tool: mldlc-lineage/record_lineage
+Parameters:
+  source_entities: ["entity_id_1", "entity_id_2"]
+  transformation: "Description of transformation"
+  destination_entity: "output_entity_id"
+  context: "Why this transformation was performed"
+  code_reference: "Link to code (optional)"
+```
+
+## Lineage Query
+
+```
+Tool: mldlc-lineage/get_lineage
+Parameters:
+  entity_id: "entity to trace"
+  direction: "upstream" | "downstream" | "both"
+  depth: 5
+```
+
+## Lineage Resources
+
+- `lineage://entity/{id}` - Entity lineage
+- `lineage://graph` - Full lineage graph
+- `lineage://impact/{id}` - Impact analysis
+
+## Lineage Prompts
+
+- `/lineage-trace` - Trace lineage of entity
+- `/lineage-impact` - Analyze impact of change

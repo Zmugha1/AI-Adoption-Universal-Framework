@@ -1,0 +1,24 @@
+{
+  "mcpServers": {
+    "mldlc-vtco": {
+      "command": "python",
+      "args": ["run_mcp_stdio.py"],
+      "env": {
+        "MLDLC_MODE": "development",
+        "MLDLC_RISK_THRESHOLD": "yellow",
+        "MLDLC_SCHEMAS_PATH": "./schemas",
+        "MLDLC_GOVERNANCE_PATH": "./governance",
+        "MLDLC_AUDIT_PATH": "./data/audit",
+        "MLDLC_LOG_LEVEL": "info"
+      }
+    },
+    "mldlc-lineage": {
+      "command": "python",
+      "args": ["run_mcp_stdio.py"],
+      "env": {
+        "MLDLC_LINEAGE_MODE": "enabled",
+        "MLDLC_LINEAGE_DEPTH": "5"
+      }
+    }
+  }
+}

@@ -1,0 +1,64 @@
+---
+description: "Validate all artifacts against JSON schemas"
+globs: '**/*.json, **/*.yaml'
+alwaysApply: true
+---
+
+# Schema Validation Enforcement
+
+## Schema Types
+
+### Dataset Schema
+- Required fields: name, version, source, schema_version
+- Data types enforced
+- Constraints validated
+
+### Model Schema
+- Required fields: name, version, type, metrics
+- Performance thresholds
+- Metadata requirements
+
+### Experiment Schema
+- Required fields: name, hypothesis, parameters, results
+- Reproducibility info
+- Artifact references
+
+### Deployment Schema
+- Required fields: model_id, environment, timestamp
+- Rollback info
+- Monitoring config
+
+## Validation Process
+
+### Before Creating Artifact
+
+```
+Tool: mldlc-vtco/validate_artifact
+Parameters:
+  artifact_type: "dataset" | "model" | "experiment" | "deployment"
+  artifact_data: {<artifact content>}
+  strict_mode: true | false
+```
+
+### Validation Response
+
+```json
+{
+  "valid": true | false,
+  "errors": ["List of validation errors"],
+  "warnings": ["List of warnings"],
+  "schema_version": "v1"
+}
+```
+
+## Schema Resources
+
+- `schema://dataset` - Dataset schema
+- `schema://model` - Model schema
+- `schema://experiment` - Experiment schema
+- `schema://deployment` - Deployment schema
+
+## Schema Prompts
+
+- `/schema-validate` - Validate artifact against schema
+- `/schema-generate` - Generate schema-compliant artifact

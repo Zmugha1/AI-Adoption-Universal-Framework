@@ -1,0 +1,24 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Model Schema v1",
+  "type": "object",
+  "required": ["name", "version", "type", "metrics"],
+  "properties": {
+    "name": {"type": "string", "description": "Model name"},
+    "version": {"type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$"},
+    "type": {"type": "string", "enum": ["classification", "regression", "clustering", "nlp", "vision"]},
+    "metrics": {
+      "type": "object",
+      "required": ["accuracy"],
+      "properties": {
+        "accuracy": {"type": "number", "minimum": 0, "maximum": 1},
+        "precision": {"type": "number", "minimum": 0, "maximum": 1},
+        "recall": {"type": "number", "minimum": 0, "maximum": 1},
+        "f1_score": {"type": "number", "minimum": 0, "maximum": 1}
+      }
+    },
+    "training_dataset_id": {"type": "string", "description": "Reference to training dataset"},
+    "lineage_id": {"type": "string"},
+    "risk_level": {"type": "string", "enum": ["RED", "YELLOW", "GREEN"]}
+  }
+}

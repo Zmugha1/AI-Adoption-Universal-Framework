@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Deployment Schema v1",
+  "type": "object",
+  "required": ["model_id", "environment", "timestamp"],
+  "properties": {
+    "model_id": {"type": "string"},
+    "environment": {"type": "string", "enum": ["development", "staging", "production"]},
+    "timestamp": {"type": "string", "format": "date-time"},
+    "schema_version": {"type": "string", "enum": ["v1"]},
+    "rollback_id": {"type": "string"},
+    "risk_level": {"type": "string", "enum": ["RED", "YELLOW", "GREEN"]}
+  }
+}

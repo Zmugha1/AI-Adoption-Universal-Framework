@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Lineage Schema v1",
+  "type": "object",
+  "required": ["lineage_id", "source_entities", "transformation", "destination_entity", "context", "timestamp"],
+  "properties": {
+    "lineage_id": {"type": "string"},
+    "source_entities": {"type": "array", "items": {"type": "string"}},
+    "transformation": {"type": "string"},
+    "destination_entity": {"type": "string"},
+    "context": {"type": "string"},
+    "timestamp": {"type": "string", "format": "date-time"},
+    "code_reference": {"type": "string"}
+  }
+}

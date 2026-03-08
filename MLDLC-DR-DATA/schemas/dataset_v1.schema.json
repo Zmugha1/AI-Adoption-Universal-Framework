@@ -1,0 +1,27 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Dataset Schema v1",
+  "type": "object",
+  "required": ["name", "version", "source", "schema_version"],
+  "properties": {
+    "name": {"type": "string", "description": "Dataset name"},
+    "version": {"type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$", "description": "Semantic version"},
+    "source": {"type": "string", "description": "Data source identifier"},
+    "schema_version": {"type": "string", "enum": ["v1"], "description": "Schema version"},
+    "description": {"type": "string", "description": "Dataset description"},
+    "columns": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "type"],
+        "properties": {
+          "name": {"type": "string"},
+          "type": {"type": "string"},
+          "description": {"type": "string"}
+        }
+      }
+    },
+    "lineage_id": {"type": "string", "description": "Lineage tracking ID"},
+    "risk_level": {"type": "string", "enum": ["RED", "YELLOW", "GREEN"], "description": "Risk classification"}
+  }
+}

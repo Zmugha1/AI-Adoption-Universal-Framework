@@ -1,0 +1,8 @@
+# VTCO Verbs - Action types
+verbs:
+  - Create
+  - Update
+  - Delete
+  - Analyze
+  - Validate
+  - Deploy

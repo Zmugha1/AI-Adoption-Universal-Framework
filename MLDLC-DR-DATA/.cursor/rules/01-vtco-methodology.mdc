@@ -1,0 +1,79 @@
+---
+description: "Enforce VTCO (Verb-Task-Constraint-Outcome) methodology on all work"
+globs: '**/*.py, **/*.sql, **/*.yaml, **/*.json'
+alwaysApply: true
+---
+
+# VTCO Methodology Enforcement
+
+## What is VTCO?
+
+**V**erb → **T**ask → **C**onstraint → **O**utcome
+
+A structured approach to defining and executing ML/data work.
+
+## VTCO Requirements for Every Task
+
+### Before Starting Work
+
+You MUST define:
+
+```
+VERB:       [Create | Update | Delete | Analyze | Validate | Deploy]
+TASK:       [Specific description of what you're doing]
+CONSTRAINT: [Limitations, requirements, boundaries]
+OUTCOME:    [Expected result/deliverable]
+```
+
+### Example VTCO Definition
+
+```
+VERB:       Create
+TASK:       Data preprocessing pipeline for customer churn model
+CONSTRAINT: Must handle missing values, validate schema, log lineage
+OUTCOME:    Clean dataset with documented transformations
+```
+
+## MCP Tool Integration
+
+### Define VTCO
+
+```
+Tool: mldlc-vtco/define_vtco
+Parameters:
+  verb: "Create"
+  task: "Data preprocessing pipeline"
+  constraints: ["Handle missing values", "Validate schema"]
+  expected_outcome: "Clean dataset with lineage"
+```
+
+### Track Progress
+
+```
+Tool: mldlc-vtco/track_vtco_progress
+Parameters:
+  vtco_id: "<from define_vtco>"
+  status: "in_progress" | "completed" | "blocked"
+  notes: "Progress update"
+```
+
+### Validate Outcome
+
+```
+Tool: mldlc-vtco/validate_outcome
+Parameters:
+  vtco_id: "<from define_vtco>"
+  actual_outcome: "What was actually produced"
+  matches_expected: true | false
+```
+
+## VTCO Resources
+
+- `vtco://active` - List active VTCO tasks
+- `vtco://{id}` - Specific VTCO task details
+- `vtco://templates` - Common VTCO templates
+
+## VTCO Prompts
+
+- `/vtco-plan` - Create VTCO plan for a project
+- `/vtco-review` - Review VTCO completion

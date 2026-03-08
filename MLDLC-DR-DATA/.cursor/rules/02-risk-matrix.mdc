@@ -1,0 +1,74 @@
+---
+description: "Apply RED/YELLOW/GREEN risk matrix classification"
+globs: '**/*.py, **/*.sql, **/*.yaml, **/*.json, **/*.md'
+alwaysApply: true
+---
+
+# Risk Matrix Classification
+
+## Risk Levels
+
+### 🔴 RED (High Risk)
+**Characteristics:**
+- Production deployment
+- Customer-facing changes
+- Data privacy implications
+- Financial impact > $10K
+- Regulatory compliance required
+
+**Requirements:**
+- Explicit approval required
+- Full documentation mandatory
+- Security review required
+- Rollback plan required
+- 24-hour observation period
+
+### 🟡 YELLOW (Medium Risk)
+**Characteristics:**
+- Staging deployment
+- Internal tool changes
+- Data quality improvements
+- Financial impact $1K-$10K
+- Process modifications
+
+**Requirements:**
+- Manager review required
+- Documentation recommended
+- Testing required
+- Monitoring required
+
+### 🟢 GREEN (Low Risk)
+**Characteristics:**
+- Development environment
+- Documentation updates
+- Test additions
+- Financial impact < $1K
+- No customer impact
+
+**Requirements:**
+- Standard process
+- Basic documentation
+- Self-review acceptable
+
+## Risk Assessment Tool
+
+```
+Tool: mldlc-vtco/assess_risk
+Parameters:
+  description: "What you're planning to do"
+  scope: "production" | "staging" | "development"
+  data_sensitivity: "high" | "medium" | "low"
+  financial_impact: "high" | "medium" | "low"
+  customer_impact: "high" | "medium" | "low"
+```
+
+## Risk Resources
+
+- `risk://matrix` - Full risk matrix definition
+- `risk://assessment/{id}` - Specific assessment
+- `risk://policies` - Risk management policies
+
+## Risk Prompts
+
+- `/risk-assess` - Assess risk of proposed change
+- `/risk-mitigate` - Create mitigation plan
